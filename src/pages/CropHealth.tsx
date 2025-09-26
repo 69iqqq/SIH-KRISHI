@@ -1,22 +1,23 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, Upload, Image as ImageIcon, AlertCircle, CheckCircle, Languages } from "lucide-react";
 import { analyzeCropPhoto } from "@/lib/gemiphoto";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function CropHealth() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [language, setLanguage] = useState<"en" | "ml">("en"); // toggle lang
+  const [language, setLanguage] = useState<"en" | "ml">("en");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle selecting image
+  // Handle image selection
   const handleImageSelect = useCallback((file: File) => {
     setSelectedImage(file);
     const reader = new FileReader();
@@ -31,7 +32,7 @@ export default function CropHealth() {
   };
 
   // Analyze image with Gemini
-  const analyzeImage = async () => {
+  const analyzeImage = useCallback(async () => {
     if (!selectedImage) return;
     setIsAnalyzing(true);
 
@@ -39,21 +40,24 @@ export default function CropHealth() {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64 = e.target?.result as string;
+
         const result = await analyzeCropPhoto({ imageBase64: base64, language });
 
         try {
-          setAnalysisResult(JSON.parse(result));
+          const parsed = JSON.parse(result);
+          setAnalysisResult(parsed);
         } catch {
+          // Wrap raw Markdown only in treatment array
           setAnalysisResult({
-            disease: result,
-            diseaseML: result,
-            confidence: 0,
+            disease: "",
+            diseaseML: "",
             severity: "",
             severityML: "",
-            treatment: [],
-            treatmentML: [],
+            treatment: [result],
+            treatmentML: [result],
           });
         }
+
         setIsAnalyzing(false);
       };
       reader.readAsDataURL(selectedImage);
@@ -62,16 +66,19 @@ export default function CropHealth() {
       alert("Failed to analyze image");
       setIsAnalyzing(false);
     }
-  };
+  }, [selectedImage, language]);
 
-  // Toggle language
-  const toggleLanguage = () => {
-    setLanguage((prev) => (prev === "en" ? "ml" : "en"));
-  };
+  // Auto-analyze whenever a new image is selected
+  useEffect(() => {
+    if (selectedImage) analyzeImage();
+  }, [selectedImage, analyzeImage]);
+
+  const toggleLanguage = () => setLanguage(prev => (prev === "en" ? "ml" : "en"));
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-5xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-4">Crop Health Analysis</h1>
           <p className="text-xl text-muted-foreground malayalam mb-4">വള ആരോഗ്യ വിശകലനം</p>
@@ -176,34 +183,30 @@ export default function CropHealth() {
                 </p>
               ) : (
                 <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
-                  {/* Disease Info */}
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-semibold text-foreground">
-                        {language === "en" ? analysisResult.disease : analysisResult.diseaseML}
-                      </h3>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">{analysisResult.confidence}%</div>
-                      <div className="text-xs text-muted-foreground">Confidence / വിശ്വാസ്യത</div>
-                    </div>
-                  </div>
+                  {/* Disease Name */}
+                  {analysisResult.disease && (
+                    <h3 className="font-semibold text-foreground">
+                      {language === "en" ? analysisResult.disease : analysisResult.diseaseML}
+                    </h3>
+                  )}
 
                   {/* Severity */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div
-                      className={`inline-flex items-center px-2 py-1 rounded text-sm ${analysisResult.severity === "Moderate"
-                          ? "bg-accent/20 text-accent"
-                          : "bg-destructive/20 text-destructive"
-                        }`}
-                    >
-                      {language === "en"
-                        ? `Severity: ${analysisResult.severity}`
-                        : `ഗുരുത്വം: ${analysisResult.severityML}`}
+                  {analysisResult.severity && (
+                    <div className="flex items-center gap-2 mb-4">
+                      <div
+                        className={`inline-flex items-center px-2 py-1 rounded text-sm ${analysisResult.severity === "Moderate"
+                            ? "bg-accent/20 text-accent"
+                            : "bg-destructive/20 text-destructive"
+                          }`}
+                      >
+                        {language === "en"
+                          ? `Severity: ${analysisResult.severity}`
+                          : `ഗുരുത്വം: ${analysisResult.severityML}`}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Treatments */}
+                  {/* Treatments - Markdown Only */}
                   <div>
                     <h4 className="font-semibold text-foreground mb-3">
                       Treatment Recommendations / ചികിത്സാ ശുപാർശകൾ
@@ -213,7 +216,7 @@ export default function CropHealth() {
                         <div key={i} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
                           <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
                           <div className="prose prose-sm max-w-none">
-                            <ReactMarkdown>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {language === "en" ? t : analysisResult.treatmentML[i]}
                             </ReactMarkdown>
                           </div>

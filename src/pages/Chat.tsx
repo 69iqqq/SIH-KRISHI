@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import ReactMarkdown from 'react-markdown'; // ADD: Import for markdown rendering
-import remarkGfm from 'remark-gfm'; // ADD: Import for GitHub Flavored Markdown
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-// ADD: Menu icon for the sidebar toggle
 import { Lock, MessageCircle, TrendingUp, Plus, Send, Mic, Trash2, Search, Bot, User, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -29,7 +28,6 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  // ADD: State to manage the sidebar's visibility
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const filteredSessions = sessions.filter(session =>
@@ -81,7 +79,6 @@ export default function Chat() {
   }
 
   if (!isAuthenticated) {
-    // CHANGE: Increased rounding for all cards on the sign-in page
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
@@ -99,7 +96,7 @@ export default function Chat() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card className="rounded-2xl"> {/* CHANGE: More rounded */}
+            <Card className="rounded-2xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="h-5 w-5 text-primary" />
@@ -115,7 +112,7 @@ export default function Chat() {
                 </p>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl"> {/* CHANGE: More rounded */}
+            <Card className="rounded-2xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-crop" />
@@ -133,7 +130,7 @@ export default function Chat() {
             </Card>
           </div>
           <div className="space-y-4">
-            <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-xl" asChild> {/* CHANGE: More rounded */}
+            <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-xl" asChild>
               <Link to="/auth">Sign In / സൈൻ ഇൻ</Link>
             </Button>
             <p className="text-sm text-muted-foreground">
@@ -148,17 +145,15 @@ export default function Chat() {
     );
   }
 
-  // Authenticated chat interface
   return (
     <div className="flex h-[calc(100vh-4rem)] bg-background">
       {/* Sidebar */}
-      {/* CHANGE: Added conditional class to toggle visibility */}
       <div className={cn(
         "w-80 border-r border-border flex-col bg-card transition-transform duration-300 ease-in-out",
         isSidebarOpen ? 'flex' : 'hidden'
       )}>
         <div className="p-4 border-b border-border">
-          <Button onClick={handleNewChat} className="w-full rounded-xl" size="sm"> {/* CHANGE: More rounded */}
+          <Button onClick={handleNewChat} className="w-full rounded-xl" size="sm">
             <Plus className="h-4 w-4 mr-2" />
             New Chat / പുതിയ ചാറ്റ്
           </Button>
@@ -170,7 +165,7 @@ export default function Chat() {
               placeholder="Search chats..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 rounded-xl" /* CHANGE: More rounded */
+              className="pl-9 rounded-xl"
             />
           </div>
         </div>
@@ -180,7 +175,6 @@ export default function Chat() {
               <div
                 key={session.id}
                 className={cn(
-                  // CHANGE: More rounded
                   "group flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-accent transition-colors",
                   currentSession?.id === session.id ? "bg-accent" : ""
                 )}
@@ -195,7 +189,6 @@ export default function Chat() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  // CHANGE: More rounded (full circle)
                   className="opacity-0 group-hover:opacity-100 h-8 w-8 p-0 rounded-full"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -219,13 +212,12 @@ export default function Chat() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* CHANGE: Added a sidebar toggle button to the header */}
         <div className="p-4 border-b border-border bg-card flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="rounded-full h-9 w-9" // CHANGE: More rounded
+            className="rounded-full h-9 w-9"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -258,11 +250,9 @@ export default function Chat() {
               <div
                 key={message.id}
                 className={cn(
-                  // CHANGE: More rounded
                   "flex gap-3 p-4 rounded-2xl",
                   message.role === 'user'
                     ? "bg-primary/5 ml-12"
-                    // CHANGE: Removed background for AI reply
                     : "mr-12"
                 )}
               >
@@ -273,11 +263,10 @@ export default function Chat() {
                     <Bot className="h-6 w-6 text-crop" />
                   )}
                 </div>
-                <div className="flex-1 prose prose-sm max-w-none prose-p:my-2 prose-headings:my-3"> {/* ADD: prose classes for markdown styling */}
-                  <div className="font-medium text-sm mb-1 not-prose"> {/* ADD: not-prose to exclude this from markdown styling */}
+                <div className="flex-1 prose prose-sm max-w-none prose-p:my-2 prose-headings:my-3">
+                  <div className="font-medium text-sm mb-1 not-prose">
                     {message.role === 'user' ? 'You' : 'Krishi Mitra'}
                   </div>
-                  {/* CHANGE: Replaced plain text with ReactMarkdown component */}
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {message.content}
                   </ReactMarkdown>
@@ -286,7 +275,7 @@ export default function Chat() {
             ))}
 
             {isProcessing && (
-              <div className="flex gap-3 p-4 rounded-2xl mr-12"> {/* CHANGE: More rounded & no background */}
+              <div className="flex gap-3 p-4 rounded-2xl mr-12">
                 <Bot className="h-6 w-6 text-crop flex-shrink-0" />
                 <div className="flex-1">
                   <div className="font-medium text-sm mb-1">Krishi Mitra</div>
@@ -308,12 +297,11 @@ export default function Chat() {
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message... / നിങ്ങളുടെ സന്ദേശം ടൈപ്പ് ചെയ്യുക..."
                 disabled={isProcessing}
-                className="pr-12 rounded-xl" /* CHANGE: More rounded */
+                className="pr-12 rounded-xl"
               />
               <Button
                 variant="ghost"
                 size="sm"
-                // CHANGE: More rounded
                 className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 rounded-full"
                 disabled
               >
@@ -324,7 +312,7 @@ export default function Chat() {
               onClick={handleSendMessage}
               disabled={!newMessage.trim() || isProcessing}
               size="sm"
-              className="rounded-xl" /* CHANGE: More rounded */
+              className="rounded-xl"
             >
               <Send className="h-4 w-4" />
             </Button>
@@ -333,4 +321,4 @@ export default function Chat() {
       </div>
     </div>
   );
-}
+} 
