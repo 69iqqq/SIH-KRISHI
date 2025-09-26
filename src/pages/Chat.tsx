@@ -1,0 +1,329 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Lock, MessageCircle, TrendingUp, Plus, Send, Mic, Trash2, Search, Bot, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useChatHistory } from '@/hooks/useChatHistory';
+import { cn } from '@/lib/utils';
+import { generateGeminiResponse } from '@/lib/gemini';
+
+export default function Chat() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const {
+    sessions,
+    currentSession,
+    messages,
+    loading: chatLoading,
+    createSession,
+    addMessage,
+    deleteSession,
+    loadSession,
+  } = useChatHistory();
+
+  const [newMessage, setNewMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const filteredSessions = sessions.filter(session =>
+    session.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || isProcessing) return;
+
+    const userMessage = newMessage.trim();
+    setNewMessage('');
+    setIsProcessing(true);
+
+    try {
+      // Create session if none exists
+      let sessionToUse = currentSession;
+      if (!sessionToUse) {
+        sessionToUse = await createSession();
+        if (!sessionToUse) return;
+      }
+
+      // Add user message
+      await addMessage(userMessage, 'user', sessionToUse.id);
+
+      // Get AI response from Gemini
+      const aiResponse = await generateGeminiResponse(userMessage);
+
+      await addMessage(aiResponse, 'assistant', sessionToUse.id);
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      await addMessage("⚠️ Unable to get response from AI.", "assistant", currentSession?.id || "");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleNewChat = async () => {
+    await createSession();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <div className="inline-flex h-20 w-20 items-center justify-center rounded-full gradient-hero mb-6">
+              <Lock className="h-10 w-10 text-primary-foreground" />
+            </div>
+
+            <h1 className="text-4xl font-bold text-foreground mb-4">
+              AI Chat Assistant
+            </h1>
+            <p className="text-xl text-muted-foreground malayalam mb-6">
+              AI ചാറ്റ് സഹായി
+            </p>
+
+            <p className="text-lg text-muted-foreground mb-8">
+              Please sign in to access the AI-powered farming assistant. Get personalized advice in Malayalam for all your farming needs.
+            </p>
+            <p className="text-muted-foreground malayalam mb-8">
+              AI ശക്തിയുള്ള കൃഷി സഹായിയെ ആക്‌സസ് ചെയ്യാൻ ദയവായി സൈൻ ഇൻ ചെയ്യുക. നിങ്ങളുടെ എല്ലാ കൃഷി ആവശ്യങ്ങൾക്കും മലയാളത്തിൽ വ്യക്തിഗതമാക്കിയ ഉപദേശം നേടുക.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-primary" />
+                  Smart Conversations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Chat with AI in Malayalam about farming techniques, crop diseases, weather patterns, and more.
+                </p>
+                <p className="text-sm text-muted-foreground malayalam mt-2">
+                  കൃഷി സാങ്കേതികതകൾ, വിള രോഗങ്ങൾ, കാലാവസ്ഥാ പാറ്റേണുകൾ എന്നിവയെക്കുറിച്ച് മലയാളത്തിൽ AI യുമായി സംസാരിക്കുക.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-crop" />
+                  Personalized Advice
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Get customized recommendations based on your location, crop type, and farming history.
+                </p>
+                <p className="text-sm text-muted-foreground malayalam mt-2">
+                  നിങ്ങളുടെ സ്ഥാനം, വിള തരം, കൃഷി ചരിത്രം എന്നിവയെ അടിസ്ഥാനമാക്കി ഇഷ്‌ടാനുസൃത ശുപാർശകൾ നേടുക.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-4">
+            <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6" asChild>
+              <Link to="/auth">Sign In / സൈൻ ഇൻ</Link>
+            </Button>
+
+            <p className="text-sm text-muted-foreground">
+              Don't have an account?
+              <Link to="/auth" className="text-primary hover:underline ml-1">
+                Sign up here / ഇവിടെ സൈൻ അപ്പ് ചെയ്യുക
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated chat interface
+  return (
+    <div className="flex h-[calc(100vh-4rem)] bg-background">
+      {/* Sidebar */}
+      <div className="w-80 border-r border-border flex flex-col bg-card">
+        <div className="p-4 border-b border-border">
+          <Button onClick={handleNewChat} className="w-full" size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            New Chat / പുതിയ ചാറ്റ്
+          </Button>
+        </div>
+
+        <div className="p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search chats..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1 px-4">
+          <div className="space-y-2">
+            {filteredSessions.map((session) => (
+              <div
+                key={session.id}
+                className={cn(
+                  "group flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors",
+                  currentSession?.id === session.id ? "bg-accent" : ""
+                )}
+                onClick={() => loadSession(session)}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate">
+                    {session.title}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(session.updated_at).toLocaleDateString()}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="opacity-0 group-hover:opacity-100 h-8 w-8 p-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteSession(session.id);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+
+            {sessions.length === 0 && !chatLoading && (
+              <div className="text-center text-muted-foreground py-8">
+                <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No chats yet</p>
+                <p className="text-xs malayalam">ഇതുവരെ ചാറ്റുകളില്ല</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        <div className="p-4 border-b border-border bg-card">
+          <h1 className="text-xl font-semibold">
+            {currentSession?.title || 'AI Chat Assistant'}
+          </h1>
+          <p className="text-sm text-muted-foreground malayalam">
+            AI ചാറ്റ് സഹായി - കൃഷിയെക്കുറിച്ച് ചോദിക്കുക
+          </p>
+        </div>
+
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4 max-w-4xl mx-auto">
+            {messages.length === 0 && !chatLoading && (
+              <div className="text-center py-12">
+                <Bot className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-medium mb-2">Welcome to Krishi Mitra</h3>
+                <p className="text-muted-foreground mb-1">
+                  Ask me anything about farming, crops, weather, or agricultural practices.
+                </p>
+                <p className="text-sm text-muted-foreground malayalam">
+                  കൃഷി, വിളകൾ, കാലാവസ്ഥ, അല്ലെങ്കിൽ കാർഷിക രീതികളെക്കുറിച്ച് എന്തും ചോദിക്കുക.
+                </p>
+              </div>
+            )}
+
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={cn(
+                  "flex gap-3 p-4 rounded-lg",
+                  message.role === 'user'
+                    ? "bg-primary/5 ml-12"
+                    : "bg-muted mr-12"
+                )}
+              >
+                <div className="flex-shrink-0">
+                  {message.role === 'user' ? (
+                    <User className="h-6 w-6 text-primary" />
+                  ) : (
+                    <Bot className="h-6 w-6 text-crop" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="font-medium text-sm mb-1">
+                    {message.role === 'user' ? 'You' : 'Krishi Mitra'}
+                  </div>
+                  <div className="text-sm whitespace-pre-wrap">
+                    {message.content}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {isProcessing && (
+              <div className="flex gap-3 p-4 rounded-lg bg-muted mr-12">
+                <Bot className="h-6 w-6 text-crop flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="font-medium text-sm mb-1">Krishi Mitra</div>
+                  <div className="text-sm text-muted-foreground">
+                    Thinking... / ചിന്തിക്കുന്നു...
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        <div className="p-4 border-t border-border bg-card">
+          <div className="flex gap-2 max-w-4xl mx-auto">
+            <div className="flex-1 relative">
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message... / നിങ്ങളുടെ സന്ദേശം ടൈപ്പ് ചെയ്യുക..."
+                disabled={isProcessing}
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                disabled
+              >
+                <Mic className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button
+              onClick={handleSendMessage}
+              disabled={!newMessage.trim() || isProcessing}
+              size="sm"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

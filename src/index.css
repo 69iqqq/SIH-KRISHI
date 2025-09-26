@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Krishi Mitra Design System - Agricultural theme with Malayalam support
+All colors MUST be HSL for proper theming
+*/
+
+@layer base {
+  :root {
+    /* Agricultural green theme */
+    --background: 48 20% 98%;
+    --foreground: 120 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 120 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 15% 15%;
+
+    /* Deep forest green primary */
+    --primary: 135 65% 25%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 135 45% 35%;
+    --primary-glow: 135 55% 45%;
+
+    /* Earthy secondary colors */
+    --secondary: 40 35% 85%;
+    --secondary-foreground: 120 15% 15%;
+
+    --muted: 48 15% 92%;
+    --muted-foreground: 120 10% 45%;
+
+    /* Warm earth accent */
+    --accent: 35 85% 65%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 135 15% 85%;
+    --input: 135 15% 90%;
+    --ring: 135 65% 25%;
+
+    /* Custom farming colors */
+    --earth: 25 45% 55%;
+    --earth-light: 25 35% 75%;
+    --harvest-gold: 45 100% 70%;
+    --crop-green: 110 60% 45%;
+    
+    /* Design system utilities */
+    --radius: 0.75rem;
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-earth: linear-gradient(180deg, hsl(var(--earth-light)), hsl(var(--earth)));
+    --shadow-soft: 0 4px 20px hsl(var(--primary) / 0.1);
+    --shadow-button: 0 2px 8px hsl(var(--primary) / 0.2);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* Dark mode - optimized for outdoor farming use */
+  .dark {
+    --background: 120 20% 8%;
+    --foreground: 48 15% 90%;
+
+    --card: 120 15% 12%;
+    --card-foreground: 48 15% 90%;
+
+    --popover: 120 15% 12%;
+    --popover-foreground: 48 15% 90%;
+
+    --primary: 135 55% 45%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 135 45% 55%;
+    --primary-glow: 135 65% 55%;
+
+    --secondary: 120 15% 20%;
+    --secondary-foreground: 48 15% 90%;
+
+    --muted: 120 10% 18%;
+    --muted-foreground: 48 10% 65%;
+
+    --accent: 35 75% 55%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 120 15% 22%;
+    --input: 120 15% 18%;
+    --ring: 135 55% 45%;
+
+    /* Dark mode farming colors */
+    --earth: 25 35% 45%;
+    --earth-light: 25 25% 65%;
+    --harvest-gold: 45 90% 60%;
+    --crop-green: 110 50% 35%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Farmer-friendly touch targets */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Malayalam font support */
+  .malayalam {
+    font-family: "Noto Sans Malayalam", "Malayam Sangam MN", system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .gradient-earth {
+    background: var(--gradient-earth);
+  }
+  
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .shadow-button {
+    box-shadow: var(--shadow-button);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  /* Farming-specific utilities */
+  .text-earth {
+    color: hsl(var(--earth));
+  }
+  
+  .text-harvest {
+    color: hsl(var(--harvest-gold));
+  }
+  
+  .text-crop {
+    color: hsl(var(--crop-green));
+  }
+  
+  .bg-earth {
+    background-color: hsl(var(--earth));
+  }
+  
+  .bg-earth-light {
+    background-color: hsl(var(--earth-light));
+  }
+}
