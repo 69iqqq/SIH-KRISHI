@@ -101,13 +101,13 @@ export default function WeatherMarket() {
                     <div className="text-sm font-medium">Temperature / താപനില</div>
                     <div className="text-lg font-bold text-foreground">{mockWeatherData.temperature}°C</div>
                   </div>
-                  
+
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <Droplets className="h-5 w-5 text-blue-500 mx-auto mb-2" />
                     <div className="text-sm font-medium">Humidity / ഈർപ്പം</div>
                     <div className="text-lg font-bold text-foreground">{mockWeatherData.humidity}%</div>
                   </div>
-                  
+
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <Wind className="h-5 w-5 text-crop mx-auto mb-2" />
                     <div className="text-sm font-medium">Wind / കാറ്റ്</div>
@@ -166,14 +166,13 @@ export default function WeatherMarket() {
                         <div className="text-sm text-muted-foreground malayalam">{item.cropML}</div>
                         <div className="text-xs text-muted-foreground">{item.unit}</div>
                       </div>
-                      
+
                       <div className="text-right">
                         <div className="text-lg font-bold text-foreground">
                           ₹{item.price.toLocaleString()}
                         </div>
-                        <div className={`flex items-center text-sm font-medium ${
-                          item.change >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
+                        <div className={`flex items-center text-sm font-medium ${item.change >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
                           {item.change >= 0 ? (
                             <TrendingUp className="h-4 w-4 mr-1" />
                           ) : (

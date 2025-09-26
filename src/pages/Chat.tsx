@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown'; // ADD: Import for markdown rendering
+import remarkGfm from 'remark-gfm'; // ADD: Import for GitHub Flavored Markdown
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Lock, MessageCircle, TrendingUp, Plus, Send, Mic, Trash2, Search, Bot, User } from 'lucide-react';
+// ADD: Menu icon for the sidebar toggle
+import { Lock, MessageCircle, TrendingUp, Plus, Send, Mic, Trash2, Search, Bot, User, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useChatHistory } from '@/hooks/useChatHistory';
@@ -26,6 +29,8 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  // ADD: State to manage the sidebar's visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const filteredSessions = sessions.filter(session =>
     session.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -33,25 +38,19 @@ export default function Chat() {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || isProcessing) return;
-
     const userMessage = newMessage.trim();
     setNewMessage('');
     setIsProcessing(true);
 
     try {
-      // Create session if none exists
       let sessionToUse = currentSession;
       if (!sessionToUse) {
         sessionToUse = await createSession();
         if (!sessionToUse) return;
       }
 
-      // Add user message
       await addMessage(userMessage, 'user', sessionToUse.id);
-
-      // Get AI response from Gemini
       const aiResponse = await generateGeminiResponse(userMessage);
-
       await addMessage(aiResponse, 'assistant', sessionToUse.id);
 
     } catch (error) {
@@ -82,6 +81,7 @@ export default function Chat() {
   }
 
   if (!isAuthenticated) {
+    // CHANGE: Increased rounding for all cards on the sign-in page
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
@@ -89,14 +89,8 @@ export default function Chat() {
             <div className="inline-flex h-20 w-20 items-center justify-center rounded-full gradient-hero mb-6">
               <Lock className="h-10 w-10 text-primary-foreground" />
             </div>
-
-            <h1 className="text-4xl font-bold text-foreground mb-4">
-              AI Chat Assistant
-            </h1>
-            <p className="text-xl text-muted-foreground malayalam mb-6">
-              AI ചാറ്റ് സഹായി
-            </p>
-
+            <h1 className="text-4xl font-bold text-foreground mb-4">AI Chat Assistant</h1>
+            <p className="text-xl text-muted-foreground malayalam mb-6">AI ചാറ്റ് സഹായി</p>
             <p className="text-lg text-muted-foreground mb-8">
               Please sign in to access the AI-powered farming assistant. Get personalized advice in Malayalam for all your farming needs.
             </p>
@@ -104,9 +98,8 @@ export default function Chat() {
               AI ശക്തിയുള്ള കൃഷി സഹായിയെ ആക്‌സസ് ചെയ്യാൻ ദയവായി സൈൻ ഇൻ ചെയ്യുക. നിങ്ങളുടെ എല്ലാ കൃഷി ആവശ്യങ്ങൾക്കും മലയാളത്തിൽ വ്യക്തിഗതമാക്കിയ ഉപദേശം നേടുക.
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card>
+            <Card className="rounded-2xl"> {/* CHANGE: More rounded */}
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="h-5 w-5 text-primary" />
@@ -122,8 +115,7 @@ export default function Chat() {
                 </p>
               </CardContent>
             </Card>
-
-            <Card>
+            <Card className="rounded-2xl"> {/* CHANGE: More rounded */}
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-crop" />
@@ -140,12 +132,10 @@ export default function Chat() {
               </CardContent>
             </Card>
           </div>
-
           <div className="space-y-4">
-            <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6" asChild>
+            <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-xl" asChild> {/* CHANGE: More rounded */}
               <Link to="/auth">Sign In / സൈൻ ഇൻ</Link>
             </Button>
-
             <p className="text-sm text-muted-foreground">
               Don't have an account?
               <Link to="/auth" className="text-primary hover:underline ml-1">
@@ -162,14 +152,17 @@ export default function Chat() {
   return (
     <div className="flex h-[calc(100vh-4rem)] bg-background">
       {/* Sidebar */}
-      <div className="w-80 border-r border-border flex flex-col bg-card">
+      {/* CHANGE: Added conditional class to toggle visibility */}
+      <div className={cn(
+        "w-80 border-r border-border flex-col bg-card transition-transform duration-300 ease-in-out",
+        isSidebarOpen ? 'flex' : 'hidden'
+      )}>
         <div className="p-4 border-b border-border">
-          <Button onClick={handleNewChat} className="w-full" size="sm">
+          <Button onClick={handleNewChat} className="w-full rounded-xl" size="sm"> {/* CHANGE: More rounded */}
             <Plus className="h-4 w-4 mr-2" />
             New Chat / പുതിയ ചാറ്റ്
           </Button>
         </div>
-
         <div className="p-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -177,26 +170,24 @@ export default function Chat() {
               placeholder="Search chats..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
+              className="pl-9 rounded-xl" /* CHANGE: More rounded */
             />
           </div>
         </div>
-
         <ScrollArea className="flex-1 px-4">
           <div className="space-y-2">
             {filteredSessions.map((session) => (
               <div
                 key={session.id}
                 className={cn(
-                  "group flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors",
+                  // CHANGE: More rounded
+                  "group flex items-center justify-between p-3 rounded-xl cursor-pointer hover:bg-accent transition-colors",
                   currentSession?.id === session.id ? "bg-accent" : ""
                 )}
                 onClick={() => loadSession(session)}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">
-                    {session.title}
-                  </div>
+                  <div className="font-medium text-sm truncate">{session.title}</div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(session.updated_at).toLocaleDateString()}
                   </div>
@@ -204,7 +195,8 @@ export default function Chat() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="opacity-0 group-hover:opacity-100 h-8 w-8 p-0"
+                  // CHANGE: More rounded (full circle)
+                  className="opacity-0 group-hover:opacity-100 h-8 w-8 p-0 rounded-full"
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteSession(session.id);
@@ -214,7 +206,6 @@ export default function Chat() {
                 </Button>
               </div>
             ))}
-
             {sessions.length === 0 && !chatLoading && (
               <div className="text-center text-muted-foreground py-8">
                 <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -228,13 +219,24 @@ export default function Chat() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        <div className="p-4 border-b border-border bg-card">
-          <h1 className="text-xl font-semibold">
-            {currentSession?.title || 'AI Chat Assistant'}
-          </h1>
-          <p className="text-sm text-muted-foreground malayalam">
-            AI ചാറ്റ് സഹായി - കൃഷിയെക്കുറിച്ച് ചോദിക്കുക
-          </p>
+        {/* CHANGE: Added a sidebar toggle button to the header */}
+        <div className="p-4 border-b border-border bg-card flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="rounded-full h-9 w-9" // CHANGE: More rounded
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-xl font-semibold">
+              {currentSession?.title || 'AI Chat Assistant'}
+            </h1>
+            <p className="text-sm text-muted-foreground malayalam">
+              AI ചാറ്റ് സഹായി - കൃഷിയെക്കുറിച്ച് ചോദിക്കുക
+            </p>
+          </div>
         </div>
 
         <ScrollArea className="flex-1 p-4">
@@ -256,10 +258,12 @@ export default function Chat() {
               <div
                 key={message.id}
                 className={cn(
-                  "flex gap-3 p-4 rounded-lg",
+                  // CHANGE: More rounded
+                  "flex gap-3 p-4 rounded-2xl",
                   message.role === 'user'
                     ? "bg-primary/5 ml-12"
-                    : "bg-muted mr-12"
+                    // CHANGE: Removed background for AI reply
+                    : "mr-12"
                 )}
               >
                 <div className="flex-shrink-0">
@@ -269,19 +273,20 @@ export default function Chat() {
                     <Bot className="h-6 w-6 text-crop" />
                   )}
                 </div>
-                <div className="flex-1">
-                  <div className="font-medium text-sm mb-1">
+                <div className="flex-1 prose prose-sm max-w-none prose-p:my-2 prose-headings:my-3"> {/* ADD: prose classes for markdown styling */}
+                  <div className="font-medium text-sm mb-1 not-prose"> {/* ADD: not-prose to exclude this from markdown styling */}
                     {message.role === 'user' ? 'You' : 'Krishi Mitra'}
                   </div>
-                  <div className="text-sm whitespace-pre-wrap">
+                  {/* CHANGE: Replaced plain text with ReactMarkdown component */}
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {message.content}
-                  </div>
+                  </ReactMarkdown>
                 </div>
               </div>
             ))}
 
             {isProcessing && (
-              <div className="flex gap-3 p-4 rounded-lg bg-muted mr-12">
+              <div className="flex gap-3 p-4 rounded-2xl mr-12"> {/* CHANGE: More rounded & no background */}
                 <Bot className="h-6 w-6 text-crop flex-shrink-0" />
                 <div className="flex-1">
                   <div className="font-medium text-sm mb-1">Krishi Mitra</div>
@@ -303,12 +308,13 @@ export default function Chat() {
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message... / നിങ്ങളുടെ സന്ദേശം ടൈപ്പ് ചെയ്യുക..."
                 disabled={isProcessing}
-                className="pr-12"
+                className="pr-12 rounded-xl" /* CHANGE: More rounded */
               />
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                // CHANGE: More rounded
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 rounded-full"
                 disabled
               >
                 <Mic className="h-4 w-4" />
@@ -318,6 +324,7 @@ export default function Chat() {
               onClick={handleSendMessage}
               disabled={!newMessage.trim() || isProcessing}
               size="sm"
+              className="rounded-xl" /* CHANGE: More rounded */
             >
               <Send className="h-4 w-4" />
             </Button>
