@@ -234,33 +234,7 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      {/* Footer (hidden on Crop Health page) */}
-      {!isCropHealthPage && (
-        <footer className="border-t bg-muted/30">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-center sm:text-left">
-                <p className="text-sm text-muted-foreground">
-                  © 2024 Krishi Mitra. Empowering farmers with AI.
-                </p>
-                {language === 'ml' && (
-                  <p className="text-xs text-muted-foreground malayalam mt-1">
-                    കൃഷി മിത്രം - കൃഷിക്കാരുടെ AI സഹായി
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center space-x-4">
-                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
-                  {language === 'en' ? 'About' : 'കുറിച്ച്'}
-                </Link>
-                <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
-                  {language === 'en' ? 'Contact' : 'ബന്ധപ്പെടുക'}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </footer>
-      )}
+      {/* Footer removed per request */}
     </div>
   );
 }

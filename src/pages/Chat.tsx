@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Lock, MessageCircle, TrendingUp, Plus, Send, Mic, Trash2, Search, Bot, User, Menu } from 'lucide-react';
+import { Lock, MessageCircle, TrendingUp, Plus, Send, Mic, Trash2, Search, Bot, User, Menu, Volume2, Square } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useChatHistory } from '@/hooks/useChatHistory';
@@ -32,14 +32,31 @@ export default function Chat() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Quick prompts for farmers (EN/ML)
+  const quickPrompts = language === 'en'
+    ? [
+        'Which crop should I grow today in Kerala?',
+        'What are the best pest control methods for rice this month?',
+        "Today’s weather and planting advice for Thrissur",
+        'Current market price for banana in Kochi?'
+      ]
+    : [
+        'കേരളത്തിൽ ഇന്ന് ഞാൻ ഏത് വിള കൃഷി ചെയ്യണം?',
+        'ഈ മാസം നെല്ലിന് മികച്ച കീടനിയന്ത്രണ മാർഗങ്ങൾ എന്തെല്ലാം?',
+        'ത്രിശ്ശൂരിന് ഇന്നത്തെ കാലാവസ്ഥയും കൃഷി നിർദേശവും',
+        'കൊച്ചിയിലെ വാഴയ്ക്കിന്റെ ഇന്നത്തെ മാർക്കറ്റ് വില?'
+      ];
 
   const filteredSessions = sessions.filter(session =>
     session.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || isProcessing) return;
-    const userMessage = newMessage.trim();
+  const handleSendMessage = async (overrideMessage?: string) => {
+    const candidate = overrideMessage ?? newMessage;
+    if (!candidate.trim() || isProcessing) return;
+    const userMessage = candidate.trim();
     setNewMessage('');
     setIsProcessing(true);
 
@@ -52,7 +69,9 @@ export default function Chat() {
 
   await addMessage(userMessage, 'user', sessionToUse.id);
   const aiResponse = await generateGeminiResponse(userMessage, { language });
-      await addMessage(aiResponse, 'assistant', sessionToUse.id);
+    await addMessage(aiResponse, 'assistant', sessionToUse.id);
+    // Speak AI response aloud
+    speakText(aiResponse);
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -60,6 +79,44 @@ export default function Chat() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  // Text-to-Speech helpers
+  const speakText = (text: string) => {
+    try {
+      if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      // Prefer Malayalam voice if ml, else Indian English for en
+      utter.lang = language === 'en' ? 'en-IN' : 'ml-IN';
+      utter.rate = 1;
+      utter.pitch = 1;
+      utter.onend = () => setIsSpeaking(false);
+      utter.onerror = () => setIsSpeaking(false);
+      setIsSpeaking(true);
+      window.speechSynthesis.speak(utter);
+    } catch (e) {
+      // no-op if TTS fails
+    }
+  };
+
+  const stopSpeaking = () => {
+    try {
+      if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+    } finally {
+      setIsSpeaking(false);
+    }
+  };
+
+  // Cleanup any ongoing speech on unmount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
+
+  // Send a predefined quick prompt directly
+  const sendPrompt = async (prompt: string) => {
+    if (isProcessing) return;
+    await handleSendMessage(prompt);
   };
 
   const handleNewChat = async () => {
@@ -147,14 +204,14 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] bg-background">
+    <div className="flex h-[calc(100vh-4rem)] bg-background overflow-hidden">
       {/* Sidebar */}
       <div className={cn(
-        "w-80 border-r border-border flex-col bg-card transition-transform duration-300 ease-in-out",
+        "w-80 border-r border-border h-full min-h-0 flex-col bg-card transition-transform duration-300 ease-in-out",
         isSidebarOpen ? 'flex' : 'hidden'
       )}>
         {/* Sidebar header: hide toggle + language toggle + title/subtitle */}
-        <div className="p-4 border-b border-border bg-card">
+        <div className="p-4 border-b border-border bg-card sticky top-0 z-10">
           <div className="flex items-center justify-between mb-3">
             <Button
               variant="ghost"
@@ -196,7 +253,7 @@ export default function Chat() {
             />
           </div>
         </div>
-        <ScrollArea className="flex-1 px-4">
+        <ScrollArea className="flex-1 px-4 overscroll-contain">
           <div className="space-y-2">
             {filteredSessions.map((session) => (
               <div
@@ -237,7 +294,7 @@ export default function Chat() {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col relative">
+  <div className="flex-1 flex flex-col relative h-full min-h-0">
         {/* Floating open-sidebar button when sidebar hidden */}
         {!isSidebarOpen && (
           <div className="absolute top-2 left-2 z-20">
@@ -253,7 +310,7 @@ export default function Chat() {
           </div>
         )}
 
-        <ScrollArea className="flex-1 p-4">
+        <ScrollArea className="flex-1 p-4 overscroll-contain">
           <div className="space-y-4 max-w-4xl mx-auto">
             {messages.length === 0 && !chatLoading && (
               <div className="text-center py-12">
@@ -266,6 +323,24 @@ export default function Chat() {
                     ? 'Ask me anything about farming, crops, weather, or agricultural practices.'
                     : 'കൃഷി, വിളകൾ, കാലാവസ്ഥ, അല്ലെങ്കിൽ കാർഷിക രീതികളെക്കുറിച്ച് എന്തും ചോദിക്കുക.'}
                 </p>
+                {/* Quick prompt chips with better padding */}
+                <div className="mt-6 p-3 sm:p-4 rounded-xl bg-muted/30 border">
+                  <div className="grid grid-cols-2 gap-3">
+                    {quickPrompts.map((q) => (
+                      <Button
+                        key={q}
+                        variant="outline"
+                        size="sm"
+                        className="justify-start rounded-xl px-4 py-3 h-auto text-left"
+                        onClick={() => sendPrompt(q)}
+                        disabled={isProcessing}
+                        title={q}
+                      >
+                        {q}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -287,8 +362,33 @@ export default function Chat() {
                   )}
                 </div>
                 <div className="flex-1 prose prose-sm max-w-none prose-p:my-2 prose-headings:my-3">
-                  <div className="font-medium text-sm mb-1 not-prose">
-                    {message.role === 'user' ? 'You' : 'Krishi Mitra'}
+                  <div className="flex items-center justify-between mb-1 not-prose">
+                    <div className="font-medium text-sm">
+                      {message.role === 'user' ? 'You' : 'Krishi Mitra'}
+                    </div>
+                    {message.role === 'assistant' && (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 rounded-full"
+                          onClick={() => speakText(message.content)}
+                          title={language === 'en' ? 'Listen' : 'കേൾക്കുക'}
+                        >
+                          <Volume2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 rounded-full"
+                          onClick={stopSpeaking}
+                          disabled={!isSpeaking}
+                          title={language === 'en' ? 'Stop' : 'നിർത്തുക'}
+                        >
+                          <Square className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {message.content}
@@ -311,7 +411,7 @@ export default function Chat() {
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t border-border bg-card">
+        <div className="p-4 border-t border-border bg-card sticky bottom-0 left-0 right-0 z-10">
           <div className="flex gap-2 max-w-4xl mx-auto">
             <div className="flex-1 relative">
               <Input
@@ -332,7 +432,7 @@ export default function Chat() {
               </Button>
             </div>
             <Button
-              onClick={handleSendMessage}
+              onClick={() => handleSendMessage()}
               disabled={!newMessage.trim() || isProcessing}
               size="sm"
               className="rounded-xl"
