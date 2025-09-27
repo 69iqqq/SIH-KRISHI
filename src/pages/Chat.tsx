@@ -68,7 +68,10 @@ export default function Chat() {
       }
 
   await addMessage(userMessage, 'user', sessionToUse.id);
-  const aiResponse = await generateGeminiResponse(userMessage, { language });
+  const aiResponse = await generateGeminiResponse(userMessage, {
+    language,
+    history: messages.map(m => ({ role: m.role, content: m.content })),
+  });
     await addMessage(aiResponse, 'assistant', sessionToUse.id);
     // Speak AI response aloud
     speakText(aiResponse);
@@ -88,7 +91,8 @@ export default function Chat() {
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
       // Prefer Malayalam voice if ml, else Indian English for en
-      utter.lang = language === 'en' ? 'en-IN' : 'ml-IN';
+  // Prefer Malayalam voice if ml; fall back to English if not available
+  utter.lang = language === 'en' ? 'en-IN' : 'ml-IN';
       utter.rate = 1;
       utter.pitch = 1;
       utter.onend = () => setIsSpeaking(false);
