@@ -9,9 +9,15 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-export async function generateGeminiResponse(prompt: string) {
+export async function generateGeminiResponse(prompt: string, opts?: { language?: "en" | "ml" }) {
   try {
-    const result = await model.generateContent(prompt);
+    let finalPrompt = prompt;
+    if (opts?.language === "ml") {
+      finalPrompt = `Reply ONLY in Malayalam. Keep it concise and farmer-friendly.\n\nUser: ${prompt}`;
+    } else if (opts?.language === "en") {
+      finalPrompt = `Reply ONLY in English. Keep it concise and farmer-friendly.\n\nUser: ${prompt}`;
+    }
+    const result = await model.generateContent(finalPrompt);
     return result.response.text();
   } catch (error) {
     console.error("Gemini API error:", error);

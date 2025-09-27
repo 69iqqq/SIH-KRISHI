@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, Target, Heart, MessageCircle, Camera, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const team = [
   {
@@ -49,22 +50,19 @@ const features = [
 ];
 
 export default function About() {
+  const { language } = useLanguage();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="py-16 sm:py-24 gradient-hero">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-primary-foreground mb-6">
-            About Krishi Mitra
+            {language === 'en' ? 'About Krishi Mitra' : 'കൃഷി മിത്രത്തെ കുറിച്ച്'}
           </h1>
-          <p className="text-2xl text-primary-foreground/90 malayalam mb-8">
-            കൃഷി മിത്രത്തെ കുറിച്ച്
-          </p>
           <p className="text-xl text-primary-foreground/90 max-w-3xl mx-auto">
-            Empowering Kerala's farmers with AI-powered technology, bringing traditional wisdom together with modern innovation.
-          </p>
-          <p className="text-lg text-primary-foreground/80 malayalam max-w-3xl mx-auto mt-4">
-            AI ശക്തിയുള്ള സാങ്കേതികവിദ്യ ഉപയോഗിച്ച് കേരളത്തിലെ കർഷകരെ ശാക്തീകരിക്കുന്നു, പരമ്പരാഗത ജ്ഞാനത്തെ ആധുനിക നൂതനത്വവുമായി കൂട്ടിയോജിപ്പിക്കുന്നു.
+            {language === 'en'
+              ? "Empowering Kerala's farmers with AI-powered technology, bringing traditional wisdom together with modern innovation."
+              : 'AI ശക്തിയുള്ള സാങ്കേതികവിദ്യ ഉപയോഗിച്ച് കേരളത്തിലെ കർഷകരെ ശാക്തീകരിക്കുന്നു, പരമ്പരാഗത ജ്ഞാനത്തെ ആധുനിക നൂതനത്വവുമായി കൂട്ടിയോജിപ്പിക്കുന്നു.'}
           </p>
         </div>
       </section>
@@ -76,15 +74,11 @@ export default function About() {
             <Card className="p-8">
               <div className="text-center">
                 <Target className="h-16 w-16 text-primary mx-auto mb-6" />
-                <h2 className="text-3xl font-bold text-foreground mb-4">Our Mission</h2>
-                <p className="text-lg text-muted-foreground malayalam mb-4">ഞങ്ങളുടെ ലക്ഷ്യം</p>
+                <h2 className="text-3xl font-bold text-foreground mb-4">{language === 'en' ? 'Our Mission' : 'ഞങ്ങളുടെ ലക്ഷ്യം'}</h2>
                 <p className="text-muted-foreground mb-4">
-                  To democratize access to agricultural knowledge and technology for farmers across Kerala, 
-                  making farming more productive, sustainable, and profitable through AI-powered solutions.
-                </p>
-                <p className="text-sm text-muted-foreground malayalam">
-                  കേരളത്തിലുടനീളമുള്ള കർഷകർക്ക് കൃഷി അറിവും സാങ്കേതികവിദ്യയും ലഭ്യമാക്കുക, 
-                  AI ശക്തിയുള്ള പരിഹാരങ്ങളിലൂടെ കൃഷി കൂടുതൽ ഉത്പാദനക്ഷമവും സുസ്ഥിരവും ലാഭകരവുമാക്കുക.
+                  {language === 'en'
+                    ? 'To democratize access to agricultural knowledge and technology for farmers across Kerala, making farming more productive, sustainable, and profitable through AI-powered solutions.'
+                    : 'കേരളത്തിലുടനീളമുള്ള കർഷകർക്ക് കൃഷി അറിവും സാങ്കേതികവിദ്യയും ലഭ്യമാക്കുക, AI ശക്തിയുള്ള പരിഹാരങ്ങളിലൂടെ കൃഷി കൂടുതൽ ഉത്പാദനക്ഷമവും സുസ്ഥിരവും ലാഭകരവുമാക്കുക.'}
                 </p>
               </div>
             </Card>
@@ -92,15 +86,11 @@ export default function About() {
             <Card className="p-8">
               <div className="text-center">
                 <Heart className="h-16 w-16 text-accent mx-auto mb-6" />
-                <h2 className="text-3xl font-bold text-foreground mb-4">Our Vision</h2>
-                <p className="text-lg text-muted-foreground malayalam mb-4">ഞങ്ങളുടെ ദർശനം</p>
+                <h2 className="text-3xl font-bold text-foreground mb-4">{language === 'en' ? 'Our Vision' : 'ഞങ്ങളുടെ ദർശനം'}</h2>
                 <p className="text-muted-foreground mb-4">
-                  To become the most trusted digital companion for farmers in Kerala, preserving traditional 
-                  farming wisdom while embracing cutting-edge technology for sustainable agriculture.
-                </p>
-                <p className="text-sm text-muted-foreground malayalam">
-                  കേരളത്തിലെ കർഷകരുടെ ഏറ്റവും വിശ്വസ്ത ഡിജിറ്റൽ സഹയാത്രികനാകുക, 
-                  പരമ്പരാഗത കൃഷി ജ്ഞാനം സംരക്ഷിക്കുകയും സുസ്ഥിര കൃഷിക്ക് അത്യാധുനിക സാങ്കേതികവിദ്യ സ്വീകരിക്കുകയും ചെയ്യുക.
+                  {language === 'en'
+                    ? 'To become the most trusted digital companion for farmers in Kerala, preserving traditional farming wisdom while embracing cutting-edge technology for sustainable agriculture.'
+                    : 'കേരളത്തിലെ കർഷകരുടെ ഏറ്റവും വിശ്വസ്ത ഡിജിറ്റൽ സഹയാത്രികനാകുക, പരമ്പരാഗത കൃഷി ജ്ഞാനം സംരക്ഷിക്കുകയും സുസ്ഥിര കൃഷിക്ക് അത്യാധുനിക സാങ്കേതികവിദ്യ സ്വീകരിക്കുകയും ചെയ്യുക.'}
                 </p>
               </div>
             </Card>
@@ -112,8 +102,7 @@ export default function About() {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">What We Offer</h2>
-            <p className="text-xl text-muted-foreground malayalam">ഞങ്ങൾ എന്താണ് വാഗ്ദാനം ചെയ്യുന്നത്</p>
+            <h2 className="text-3xl font-bold text-foreground mb-4">{language === 'en' ? 'What We Offer' : 'ഞങ്ങൾ എന്താണ് വാഗ്ദാനം ചെയ്യുന്നത്'}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -126,11 +115,8 @@ export default function About() {
                       <Icon className="h-8 w-8 text-primary-foreground" />
                     </div>
                     <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {feature.title}
+                      {language === 'en' ? feature.title : feature.titleML}
                     </h3>
-                    <p className="text-muted-foreground malayalam mb-3">
-                      {feature.titleML}
-                    </p>
                     <p className="text-muted-foreground">
                       {feature.description}
                     </p>
@@ -146,11 +132,9 @@ export default function About() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">Our Team</h2>
-            <p className="text-xl text-muted-foreground malayalam mb-4">ഞങ്ങളുടെ ടീം</p>
+            <h2 className="text-3xl font-bold text-foreground mb-4">{language === 'en' ? 'Our Team' : 'ഞങ്ങളുടെ ടീം'}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              A passionate team of developers, agricultural experts, and AI specialists working together 
-              to revolutionize farming in Kerala.
+              {language === 'en' ? 'A passionate team of developers, agricultural experts, and AI specialists working together to revolutionize farming in Kerala.' : 'കേരളത്തിലെ കൃഷിയിൽ വിപ്ലവം സൃഷ്ടിക്കാൻ ഒരുമിച്ച് പ്രവർത്തിക്കുന്ന ഡെവലപ്പർമാരും കൃഷി വിദഗ്ധരും AI സ്പെഷ്യലിസ്റ്റുമാരും അടങ്ങിയ ഒരു ആത്മാർത്ഥ ടീം.'}
             </p>
           </div>
 
@@ -162,16 +146,10 @@ export default function About() {
                     <Users className="h-12 w-12 text-primary-foreground" />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground mb-1">
-                    {member.name}
+                    {language === 'en' ? member.name : member.nameML}
                   </h3>
-                  <p className="text-sm text-muted-foreground malayalam mb-2">
-                    {member.nameML}
-                  </p>
-                  <div className="text-primary font-medium mb-1">
-                    {member.role}
-                  </div>
-                  <div className="text-sm text-muted-foreground malayalam mb-3">
-                    {member.roleML}
+                  <div className="text-primary font-medium mb-3">
+                    {language === 'en' ? member.role : member.roleML}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {member.description}
@@ -214,22 +192,19 @@ export default function About() {
       {/* CTA Section */}
       <section className="py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            Ready to Transform Your Farming?
+          <h2 className="text-3xl font-bold text-foreground mb-8">
+            {language === 'en' ? 'Ready to Transform Your Farming?' : 'നിങ്ങളുടെ കൃഷി മാറ്റാൻ തയ്യാറാണോ?'}
           </h2>
-          <p className="text-xl text-muted-foreground malayalam mb-8">
-            നിങ്ങളുടെ കൃഷി മാറ്റാൻ തയ്യാറാണോ?
-          </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
               <Link to="/chat">
-                Start Using Krishi Mitra / കൃഷി മിത്രം ഉപയോഗിക്കാൻ ആരംഭിക്കുക
+                {language === 'en' ? 'Start Using Krishi Mitra' : 'കൃഷി മിത്രം ഉപയോഗിക്കാൻ ആരംഭിക്കുക'}
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
               <Link to="/contact">
-                Contact Us / ഞങ്ങളെ ബന്ധപ്പെടുക
+                {language === 'en' ? 'Contact Us' : 'ഞങ്ങളെ ബന്ധപ്പെടുക'}
               </Link>
             </Button>
           </div>

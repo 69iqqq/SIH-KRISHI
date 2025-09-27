@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingBag, Plus, Search, Filter, Star, MapPin, Phone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/hooks/useLanguage';
+import { Button as UIButton } from '@/components/ui/button';
 
 const mockProducts = [
   {
@@ -92,6 +94,7 @@ export default function Marketplace() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
+  const { language } = useLanguage();
 
   const filteredProducts = mockProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -105,16 +108,12 @@ export default function Marketplace() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Marketplace
+            {language === 'en' ? 'Marketplace' : 'മാർക്കറ്റ്‌പ്ലേസ്'}
           </h1>
-          <p className="text-xl text-muted-foreground malayalam mb-4">
-            മാർക്കറ്റ്‌പ്ലേസ്
-          </p>
           <p className="text-lg text-muted-foreground">
-            Buy and sell crops directly with fellow farmers across Kerala
-          </p>
-          <p className="text-muted-foreground malayalam">
-            കേരളത്തിലുടനീളമുള്ള സഹ കർഷകരുമായി നേരിട്ട് വിളകൾ വാങ്ങുകയും വിൽക്കുകയും ചെയ്യുക
+            {language === 'en'
+              ? 'Buy and sell crops directly with fellow farmers across Kerala'
+              : 'കേരളത്തിലുടനീളമുള്ള സഹ കർഷകരുമായി നേരിട്ട് വിളകൾ വാങ്ങുകയും വിൽക്കുകയും ചെയ്യുക'}
           </p>
         </div>
 
@@ -124,7 +123,7 @@ export default function Marketplace() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search products... / ഉത്പാദനങ്ങൾ തിരയുക..."
+                placeholder={language === 'en' ? 'Search products...' : 'ഉത്പാദനങ്ങൾ തിരയുക...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -141,7 +140,7 @@ export default function Marketplace() {
           
           <Button className="lg:w-auto">
             <Plus className="mr-2 h-4 w-4" />
-            Sell Your Crop / നിങ്ങളുടെ വിള വിൽക്കുക
+            {language === 'en' ? 'Sell Your Crop' : 'നിങ്ങളുടെ വിള വിൽക്കുക'}
           </Button>
         </div>
 
@@ -151,7 +150,7 @@ export default function Marketplace() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  Categories / വിഭാഗങ്ങൾ
+                  {language === 'en' ? 'Categories' : 'വിഭാഗങ്ങൾ'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -165,8 +164,7 @@ export default function Marketplace() {
                         : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <div>{category.name}</div>
-                    <div className="text-sm malayalam opacity-75">{category.nameML}</div>
+                    <div>{language === 'en' ? category.name : category.nameML}</div>
                   </button>
                 ))}
               </CardContent>
@@ -186,7 +184,7 @@ export default function Marketplace() {
                     {!product.inStock && (
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                         <Badge variant="destructive" className="text-sm">
-                          Out of Stock / സ്റ്റോക്ക് ഇല്ല
+                          {language === 'en' ? 'Out of Stock' : 'സ്റ്റോക്ക് ഇല്ല'}
                         </Badge>
                       </div>
                     )}
@@ -196,18 +194,15 @@ export default function Marketplace() {
                         product.inStock ? 'bg-green-500' : 'bg-gray-500'
                       }`}
                     >
-                      {product.category} / {product.categoryML}
+                      {language === 'en' ? product.category : product.categoryML}
                     </Badge>
                   </div>
 
                   <CardContent className="p-4">
                     <div className="mb-3">
                       <h3 className="font-semibold text-foreground mb-1">
-                        {product.name}
+                        {language === 'en' ? product.name : product.nameML}
                       </h3>
-                      <p className="text-sm text-muted-foreground malayalam">
-                        {product.nameML}
-                      </p>
                     </div>
 
                     <div className="flex items-center justify-between mb-3">
@@ -216,7 +211,7 @@ export default function Marketplace() {
                           ₹{product.price.toLocaleString()}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          per {product.unit} / {product.unitML}
+                          {language === 'en' ? `per ${product.unit}` : `${product.unitML} ന്`}
                         </div>
                       </div>
                       
@@ -226,19 +221,18 @@ export default function Marketplace() {
                           {product.rating}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {product.quantity} available
+                          {language === 'en' ? `${product.quantity} available` : `${product.quantity} ലഭ്യം`}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                       <MapPin className="h-4 w-4" />
-                      <span>{product.location} / {product.locationML}</span>
+                      <span>{language === 'en' ? product.location : product.locationML}</span>
                     </div>
 
                     <div className="text-sm text-muted-foreground mb-4">
-                      <div>Seller: {product.seller}</div>
-                      <div className="malayalam">വിൽപ്പനക്കാരൻ: {product.sellerML}</div>
+                      <div>{language === 'en' ? `Seller: ${product.seller}` : `വിൽപ്പനക്കാരൻ: ${product.sellerML}`}</div>
                     </div>
 
                     <div className="flex gap-2">
@@ -247,7 +241,7 @@ export default function Marketplace() {
                         disabled={!product.inStock}
                       >
                         <ShoppingBag className="mr-2 h-4 w-4" />
-                        {product.inStock ? 'Buy Now / ഇപ്പോൾ വാങ്ങുക' : 'Out of Stock'}
+                        {product.inStock ? (language === 'en' ? 'Buy Now' : 'ഇപ്പോൾ വാങ്ങുക') : (language === 'en' ? 'Out of Stock' : 'സ്റ്റോക്ക് ഇല്ല')}
                       </Button>
                       
                       <Button variant="outline" size="icon">
@@ -265,13 +259,10 @@ export default function Marketplace() {
                   <Search className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  No products found
+                  {language === 'en' ? 'No products found' : 'ഒരു ഉത്പാദനങ്ങളും കണ്ടെത്തിയില്ല'}
                 </h3>
-                <p className="text-muted-foreground malayalam mb-4">
-                  ഒരു ഉത്പാദനങ്ങളും കണ്ടെത്തിയില്ല
-                </p>
                 <Button variant="outline">
-                  Clear Filters / ഫിൽട്ടറുകൾ മായ്ക്കുക
+                  {language === 'en' ? 'Clear Filters' : 'ഫിൽട്ടറുകൾ മായ്ക്കുക'}
                 </Button>
               </div>
             )}

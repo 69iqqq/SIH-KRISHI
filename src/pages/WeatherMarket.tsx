@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CloudSun, Thermometer, Droplets, Wind, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
+import { Languages } from 'lucide-react';
 
 const mockWeatherData = {
   location: 'Thiruvananthapuram, Kerala',
@@ -29,6 +31,7 @@ const mockMarketData = [
 
 export default function WeatherMarket() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const { language, toggleLanguage } = useLanguage();
 
   const refreshData = () => {
     setLastUpdated(new Date());
@@ -40,26 +43,28 @@ export default function WeatherMarket() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Weather & Market Prices
+            {language === 'en' ? 'Weather & Market Prices' : 'കാലാവസ്ഥയും മാർക്കറ്റ് വിലയും'}
           </h1>
-          <p className="text-xl text-muted-foreground malayalam mb-4">
-            കാലാവസ്ഥയും മാർക്കറ്റ് വിലയും
-          </p>
           <p className="text-lg text-muted-foreground">
-            Live weather updates and daily mandi prices for Kerala farmers
-          </p>
-          <p className="text-muted-foreground malayalam">
-            കേരളത്തിലെ കർഷകർക്കായി തത്സമയ കാലാവസ്ഥാ അപ്‌ഡേറ്റുകളും ദൈനംദിന മണ്ഡി വിലകളും
+            {language === 'en'
+              ? 'Live weather updates and daily mandi prices for Kerala farmers'
+              : 'കേരളത്തിലെ കർഷകർക്കായി തത്സമയ കാലാവസ്ഥാ അപ്‌ഡേറ്റുകളും ദൈനംദിന മണ്ഡി വിലകളും'}
           </p>
         </div>
 
         <div className="flex justify-between items-center mb-6">
           <p className="text-sm text-muted-foreground">
-            Last updated: {lastUpdated.toLocaleString()} / അവസാനമായി അപ്‌ഡേറ്റ് ചെയ്തത്: {lastUpdated.toLocaleTimeString()}
+            {language === 'en'
+              ? `Last updated: ${lastUpdated.toLocaleString()}`
+              : `അവസാനമായി അപ്‌ഡേറ്റ് ചെയ്തത്: ${lastUpdated.toLocaleTimeString()}`}
           </p>
           <Button variant="outline" size="sm" onClick={refreshData}>
             <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh / പുതുക്കുക
+            {language === 'en' ? 'Refresh' : 'പുതുക്കുക'}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={toggleLanguage}>
+            <Languages className="mr-2 h-4 w-4" />
+            {language === 'en' ? 'English' : 'മലയാളം'}
           </Button>
         </div>
 
@@ -70,10 +75,7 @@ export default function WeatherMarket() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CloudSun className="h-5 w-5 text-accent" />
-                  Current Weather
-                  <span className="text-sm font-normal text-muted-foreground malayalam">
-                    / നിലവിലെ കാലാവസ്ഥ
-                  </span>
+                  {language === 'en' ? 'Current Weather' : 'നിലവിലെ കാലാവസ്ഥ'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -82,35 +84,29 @@ export default function WeatherMarket() {
                     {mockWeatherData.temperature}°C
                   </div>
                   <div className="text-muted-foreground">
-                    {mockWeatherData.condition}
-                  </div>
-                  <div className="text-sm text-muted-foreground malayalam">
-                    {mockWeatherData.conditionML}
+                    {language === 'en' ? mockWeatherData.condition : mockWeatherData.conditionML}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
-                    {mockWeatherData.location}
-                  </div>
-                  <div className="text-xs text-muted-foreground malayalam">
-                    {mockWeatherData.locationML}
+                    {language === 'en' ? mockWeatherData.location : mockWeatherData.locationML}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <Thermometer className="h-5 w-5 text-primary mx-auto mb-2" />
-                    <div className="text-sm font-medium">Temperature / താപനില</div>
+                    <div className="text-sm font-medium">{language === 'en' ? 'Temperature' : 'താപനില'}</div>
                     <div className="text-lg font-bold text-foreground">{mockWeatherData.temperature}°C</div>
                   </div>
 
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <Droplets className="h-5 w-5 text-blue-500 mx-auto mb-2" />
-                    <div className="text-sm font-medium">Humidity / ഈർപ്പം</div>
+                    <div className="text-sm font-medium">{language === 'en' ? 'Humidity' : 'ഈർപ്പം'}</div>
                     <div className="text-lg font-bold text-foreground">{mockWeatherData.humidity}%</div>
                   </div>
 
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <Wind className="h-5 w-5 text-crop mx-auto mb-2" />
-                    <div className="text-sm font-medium">Wind / കാറ്റ്</div>
+                    <div className="text-sm font-medium">{language === 'en' ? 'Wind' : 'കാറ്റ്'}</div>
                     <div className="text-lg font-bold text-foreground">{mockWeatherData.windSpeed} km/h</div>
                   </div>
                 </div>
@@ -121,7 +117,7 @@ export default function WeatherMarket() {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  3-Day Forecast / 3 ദിവസത്തെ പ്രവചനം
+                  {language === 'en' ? '3-Day Forecast' : '3 ദിവസത്തെ പ്രവചനം'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -129,8 +125,7 @@ export default function WeatherMarket() {
                   {mockWeatherData.forecast.map((day, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                       <div>
-                        <div className="font-medium">{day.day}</div>
-                        <div className="text-sm text-muted-foreground malayalam">{day.dayML}</div>
+                        <div className="font-medium">{language === 'en' ? day.day : day.dayML}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-sm text-muted-foreground">{day.condition}</div>
@@ -151,10 +146,7 @@ export default function WeatherMarket() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-harvest" />
-                  Market Prices
-                  <span className="text-sm font-normal text-muted-foreground malayalam">
-                    / മാർക്കറ്റ് വിലകൾ
-                  </span>
+                  {language === 'en' ? 'Market Prices' : 'മാർക്കറ്റ് വിലകൾ'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -162,8 +154,7 @@ export default function WeatherMarket() {
                   {mockMarketData.map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-smooth">
                       <div className="flex-1">
-                        <div className="font-medium text-foreground">{item.crop}</div>
-                        <div className="text-sm text-muted-foreground malayalam">{item.cropML}</div>
+                        <div className="font-medium text-foreground">{language === 'en' ? item.crop : item.cropML}</div>
                         <div className="text-xs text-muted-foreground">{item.unit}</div>
                       </div>
 
@@ -187,10 +178,9 @@ export default function WeatherMarket() {
 
                 <div className="mt-6 p-4 bg-primary/10 rounded-lg">
                   <p className="text-sm text-muted-foreground text-center">
-                    Prices are indicative and may vary by location and market conditions.
-                  </p>
-                  <p className="text-xs text-muted-foreground malayalam text-center mt-1">
-                    വിലകൾ സൂചനാപരമാണ്, സ്ഥലവും മാർക്കറ്റ് സാഹചര്യങ്ങളും അനുസരിച്ച് വ്യത്യാസപ്പെടാം.
+                    {language === 'en'
+                      ? 'Prices are indicative and may vary by location and market conditions.'
+                      : 'വിലകൾ സൂചനാപരമാണ്, സ്ഥലവും മാർക്കറ്റ് സാഹചര്യങ്ങളും അനുസരിച്ച് വ്യത്യാസപ്പെടാം.'}
                   </p>
                 </div>
               </CardContent>
@@ -202,15 +192,18 @@ export default function WeatherMarket() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <Card>
             <CardHeader>
-              <CardTitle>Weather Alerts / കാലാവസ്ഥാ മുന്നറിയിപ്പുകൾ</CardTitle>
+              <CardTitle>{language === 'en' ? 'Weather Alerts' : 'കാലാവസ്ഥാ മുന്നറിയിപ്പുകൾ'}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="p-3 bg-accent/20 border-l-4 border-accent rounded">
-                  <div className="font-medium text-accent-foreground">Heavy Rain Expected</div>
-                  <div className="text-sm text-muted-foreground malayalam">കനത്ത മഴ പ്രതീക്ഷിക്കുന്നു</div>
+                  <div className="font-medium text-accent-foreground">
+                    {language === 'en' ? 'Heavy Rain Expected' : 'കനത്ത മഴ പ്രതീക്ഷിക്കുന്നു'}
+                  </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    Heavy rainfall expected in the next 48 hours. Protect young crops.
+                    {language === 'en'
+                      ? 'Heavy rainfall expected in the next 48 hours. Protect young crops.'
+                      : 'അടുത്ത 48 മണിക്കൂറിനുള്ളിൽ കനത്ത മഴ പ്രതീക്ഷിക്കുന്നു. ചെറുപ്പമുള്ള വിളകൾ സംരക്ഷിക്കുക.'}
                   </div>
                 </div>
               </div>
@@ -219,15 +212,18 @@ export default function WeatherMarket() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Market Insights / മാർക്കറ്റ് സൂചനകൾ</CardTitle>
+              <CardTitle>{language === 'en' ? 'Market Insights' : 'മാർക്കറ്റ് സൂചനകൾ'}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="p-3 bg-green-50 dark:bg-green-950 border-l-4 border-green-500 rounded">
-                  <div className="font-medium text-green-700 dark:text-green-300">Pepper Prices Rising</div>
-                  <div className="text-sm text-muted-foreground malayalam">കുരുമുളകിന്റെ വില വർധിക്കുന്നു</div>
+                  <div className="font-medium text-green-700 dark:text-green-300">
+                    {language === 'en' ? 'Pepper Prices Rising' : 'കുരുമുളകിന്റെ വില വർധിക്കുന്നു'}
+                  </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    Good time to sell pepper stocks. Demand is increasing in export markets.
+                    {language === 'en'
+                      ? 'Good time to sell pepper stocks. Demand is increasing in export markets.'
+                      : 'കുരുമുളക് സ്റ്റോക്കുകൾ വിൽക്കാൻ നല്ല സമയം. കയറ്റുമതി വിപണികളിൽ ആവശ്യം വർധിക്കുന്നു.'}
                   </div>
                 </div>
               </div>

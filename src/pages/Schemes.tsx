@@ -33,6 +33,7 @@ import {
   Leaf,
   SlidersHorizontal,
 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const schemes = [
   {
@@ -132,6 +133,7 @@ const categories = [
 export default function Schemes() {
   const [filters, setFilters] = useState<any>({});
   const [showFiltered, setShowFiltered] = useState(false);
+  const { language } = useLanguage();
 
   const handleFilter = (e: any) => {
     e.preventDefault();
@@ -152,13 +154,10 @@ export default function Schemes() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Government Schemes
+            {language === 'en' ? 'Government Schemes' : 'സർക്കാർ പദ്ധതികൾ'}
           </h1>
-          <p className="text-xl text-muted-foreground malayalam mb-4">
-            സർക്കാർ പദ്ധതികൾ
-          </p>
           <p className="text-lg text-muted-foreground">
-            Latest farming subsidies and government schemes for Kerala farmers
+            {language === 'en' ? 'Latest farming subsidies and government schemes for Kerala farmers' : 'കേരളത്തിലെ കർഷകർക്കായി ഏറ്റവും പുതിയ കൃഷി സബ്‌സിഡികളും സർക്കാർ പദ്ധതികളും'}
           </p>
         </div>
 
@@ -168,34 +167,34 @@ export default function Schemes() {
             <DialogTrigger asChild>
               <Button variant="default" className="flex items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4" />
-                Advanced Filter
+                {language === 'en' ? 'Advanced Filter' : 'അഡ്വാൻസ്ഡ് ഫിൽറ്റർ'}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle>Filter Schemes</DialogTitle>
+                <DialogTitle>{language === 'en' ? 'Filter Schemes' : 'പദ്ധതികൾ ഫിൽറ്റർ ചെയ്യുക'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleFilter} className="space-y-4">
                 <Input
-                  placeholder="Income (₹)"
+                  placeholder={language === 'en' ? 'Income (₹)' : 'വരുമാനം (₹)'}
                   onChange={(e) =>
                     setFilters({ ...filters, income: e.target.value })
                   }
                 />
                 <Input
-                  placeholder="Age"
+                  placeholder={language === 'en' ? 'Age' : 'വയസ്'}
                   onChange={(e) =>
                     setFilters({ ...filters, age: e.target.value })
                   }
                 />
                 <Input
-                  placeholder="Caste"
+                  placeholder={language === 'en' ? 'Caste' : 'ജാതി'}
                   onChange={(e) =>
                     setFilters({ ...filters, caste: e.target.value })
                   }
                 />
                 <Input
-                  placeholder="Region"
+                  placeholder={language === 'en' ? 'Region' : 'പ്രദേശം'}
                   onChange={(e) =>
                     setFilters({ ...filters, region: e.target.value })
                   }
@@ -204,7 +203,7 @@ export default function Schemes() {
                   onValueChange={(val) => setFilters({ ...filters, state: val })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select State" />
+                    <SelectValue placeholder={language === 'en' ? 'Select State' : 'സംസ്ഥാനം തിരഞ്ഞെടുക്കുക'} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Kerala">Kerala</SelectItem>
@@ -213,13 +212,13 @@ export default function Schemes() {
                   </SelectContent>
                 </Select>
                 <Input
-                  placeholder="City"
+                  placeholder={language === 'en' ? 'City' : 'നഗരം'}
                   onChange={(e) =>
                     setFilters({ ...filters, city: e.target.value })
                   }
                 />
                 <Button type="submit" className="w-full">
-                  Apply Filters
+                  {language === 'en' ? 'Apply Filters' : 'ഫിൽറ്ററുകൾ പ്രയോഗിക്കുക'}
                 </Button>
               </form>
             </DialogContent>
@@ -232,10 +231,7 @@ export default function Schemes() {
               size="sm"
               className="flex flex-col h-auto py-2 px-4"
             >
-              <span>{category.name}</span>
-              <span className="text-xs malayalam opacity-75">
-                {category.nameML}
-              </span>
+              <span>{language === 'en' ? category.name : category.nameML}</span>
             </Button>
           ))}
         </div>
@@ -257,11 +253,8 @@ export default function Schemes() {
                       </div>
                       <div className="flex-1">
                         <CardTitle className="text-lg mb-2">
-                          {scheme.title}
+                          {language === 'en' ? scheme.title : scheme.titleML}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground malayalam mb-3">
-                          {scheme.titleML}
-                        </p>
                       </div>
                     </div>
 
@@ -281,10 +274,7 @@ export default function Schemes() {
                 <CardContent className="space-y-4">
                   <div>
                     <p className="text-muted-foreground mb-2">
-                      {scheme.description}
-                    </p>
-                    <p className="text-sm text-muted-foreground malayalam">
-                      {scheme.descriptionML}
+                      {language === 'en' ? scheme.description : scheme.descriptionML}
                     </p>
                   </div>
 
@@ -293,14 +283,11 @@ export default function Schemes() {
                       <div className="flex items-center gap-2 mb-2">
                         <IndianRupee className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium">
-                          Amount / തുക
+                          {language === 'en' ? 'Amount' : 'തുക'}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {scheme.amount}
-                      </p>
-                      <p className="text-xs text-muted-foreground malayalam">
-                        {scheme.amountML}
+                        {language === 'en' ? scheme.amount : scheme.amountML}
                       </p>
                     </div>
 
@@ -308,14 +295,11 @@ export default function Schemes() {
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="h-4 w-4 text-accent" />
                         <span className="text-sm font-medium">
-                          Deadline / സമയപരിധി
+                          {language === 'en' ? 'Deadline' : 'സമയംപരിധി'}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {scheme.deadline}
-                      </p>
-                      <p className="text-xs text-muted-foreground malayalam">
-                        {scheme.deadlineML}
+                        {language === 'en' ? scheme.deadline : scheme.deadlineML}
                       </p>
                     </div>
                   </div>
@@ -324,24 +308,21 @@ export default function Schemes() {
                     <div className="flex items-center gap-2 mb-2">
                       <Users className="h-4 w-4 text-crop" />
                       <span className="text-sm font-medium">
-                        Eligibility / യോഗ്യത
+                        {language === 'en' ? 'Eligibility' : 'യോഗ്യത'}
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">
-                      {scheme.eligibility}
-                    </p>
-                    <p className="text-xs text-muted-foreground malayalam">
-                      {scheme.eligibilityML}
+                      {language === 'en' ? scheme.eligibility : scheme.eligibilityML}
                     </p>
                   </div>
 
                   <div className="flex gap-2 pt-2">
                     <Button className="flex-1" size="sm">
-                      Apply Now / ഇപ്പോൾ അപേക്ഷിക്കുക
+                      {language === 'en' ? 'Apply Now' : 'ഇപ്പോൾ അപേക്ഷിക്കുക'}
                     </Button>
                     <Button variant="outline" size="sm">
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      Details / വിശദാംശങ്ങൾ
+                      {language === 'en' ? 'Details' : 'വിശദാംശങ്ങൾ'}
                     </Button>
                   </div>
                 </CardContent>
@@ -356,10 +337,10 @@ export default function Schemes() {
             <div className="text-center">
               <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                Didn’t find what you need?
+                {language === 'en' ? "Didn’t find what you need?" : 'താങ്കൾക്ക് വേണ്ടത് കണ്ടെത്താനായില്ലേ?'}
               </h3>
               <p className="text-muted-foreground mb-4">
-                Try official portals for more schemes:
+                {language === 'en' ? 'Try official portals for more schemes:' : 'കൂടുതൽ പദ്ധതികൾക്കായി ഔദ്യോഗിക പോർട്ടലുകൾ ശ്രമിക്കുക:'}
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Button variant="outline" asChild>

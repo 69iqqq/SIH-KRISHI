@@ -11,9 +11,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChatHistory } from '@/hooks/useChatHistory';
 import { cn } from '@/lib/utils';
 import { generateGeminiResponse } from '@/lib/gemini';
+import { useLanguage } from '@/hooks/useLanguage';
+import { Languages } from 'lucide-react';
 
 export default function Chat() {
   const { isAuthenticated, loading: authLoading } = useAuth();
+  const { language, toggleLanguage } = useLanguage();
   const {
     sessions,
     currentSession,
@@ -47,8 +50,8 @@ export default function Chat() {
         if (!sessionToUse) return;
       }
 
-      await addMessage(userMessage, 'user', sessionToUse.id);
-      const aiResponse = await generateGeminiResponse(userMessage);
+  await addMessage(userMessage, 'user', sessionToUse.id);
+  const aiResponse = await generateGeminiResponse(userMessage, { language });
       await addMessage(aiResponse, 'assistant', sessionToUse.id);
 
     } catch (error) {
@@ -86,13 +89,13 @@ export default function Chat() {
             <div className="inline-flex h-20 w-20 items-center justify-center rounded-full gradient-hero mb-6">
               <Lock className="h-10 w-10 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-bold text-foreground mb-4">AI Chat Assistant</h1>
-            <p className="text-xl text-muted-foreground malayalam mb-6">AI ചാറ്റ് സഹായി</p>
+            <h1 className="text-4xl font-bold text-foreground mb-4">
+              {language === 'en' ? 'AI Chat Assistant' : 'AI ചാറ്റ് സഹായി'}
+            </h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Please sign in to access the AI-powered farming assistant. Get personalized advice in Malayalam for all your farming needs.
-            </p>
-            <p className="text-muted-foreground malayalam mb-8">
-              AI ശക്തിയുള്ള കൃഷി സഹായിയെ ആക്‌സസ് ചെയ്യാൻ ദയവായി സൈൻ ഇൻ ചെയ്യുക. നിങ്ങളുടെ എല്ലാ കൃഷി ആവശ്യങ്ങൾക്കും മലയാളത്തിൽ വ്യക്തിഗതമാക്കിയ ഉപദേശം നേടുക.
+              {language === 'en'
+                ? 'Please sign in to access the AI-powered farming assistant. Get personalized advice for all your farming needs.'
+                : 'AI ശക്തിയുള്ള കൃഷി സഹായിയെ ആക്‌സസ് ചെയ്യാൻ ദയവായി സൈൻ ഇൻ ചെയ്യുക. നിങ്ങളുടെ എല്ലാ കൃഷി ആവശ്യങ്ങൾക്കും വ്യക്തിഗതമാക്കിയ ഉപദേശം നേടുക.'}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -100,15 +103,14 @@ export default function Chat() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="h-5 w-5 text-primary" />
-                  Smart Conversations
+                  {language === 'en' ? 'Smart Conversations' : 'സ്മാർട്ട് സംഭാഷണങ്ങൾ'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Chat with AI in Malayalam about farming techniques, crop diseases, weather patterns, and more.
-                </p>
-                <p className="text-sm text-muted-foreground malayalam mt-2">
-                  കൃഷി സാങ്കേതികതകൾ, വിള രോഗങ്ങൾ, കാലാവസ്ഥാ പാറ്റേണുകൾ എന്നിവയെക്കുറിച്ച് മലയാളത്തിൽ AI യുമായി സംസാരിക്കുക.
+                  {language === 'en'
+                    ? 'Chat with AI about farming techniques, crop diseases, weather patterns, and more.'
+                    : 'കൃഷി സാങ്കേതികതകൾ, വിള രോഗങ്ങൾ, കാലാവസ്ഥാ പാറ്റേണുകൾ എന്നിവയെക്കുറിച്ച് AI യുമായി സംസാരിക്കുക.'}
                 </p>
               </CardContent>
             </Card>
@@ -116,27 +118,26 @@ export default function Chat() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-crop" />
-                  Personalized Advice
+                  {language === 'en' ? 'Personalized Advice' : 'വ്യക്തിഗത ഉപദേശം'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Get customized recommendations based on your location, crop type, and farming history.
-                </p>
-                <p className="text-sm text-muted-foreground malayalam mt-2">
-                  നിങ്ങളുടെ സ്ഥാനം, വിള തരം, കൃഷി ചരിത്രം എന്നിവയെ അടിസ്ഥാനമാക്കി ഇഷ്‌ടാനുസൃത ശുപാർശകൾ നേടുക.
+                  {language === 'en'
+                    ? 'Get customized recommendations based on your location, crop type, and farming history.'
+                    : 'നിങ്ങളുടെ സ്ഥാനം, വിള തരം, കൃഷി ചരിത്രം എന്നിവയെ അടിസ്ഥാനമാക്കി ഇഷ്‌ടാനുസൃത ശുപാർശകൾ നേടുക.'}
                 </p>
               </CardContent>
             </Card>
           </div>
           <div className="space-y-4">
             <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-xl" asChild>
-              <Link to="/auth">Sign In / സൈൻ ഇൻ</Link>
+              <Link to="/auth">{language === 'en' ? 'Sign In' : 'സൈൻ ഇൻ'}</Link>
             </Button>
             <p className="text-sm text-muted-foreground">
-              Don't have an account?
+              {language === 'en' ? "Don't have an account?" : 'അക്കൗണ്ട് ഇല്ലേ?'}
               <Link to="/auth" className="text-primary hover:underline ml-1">
-                Sign up here / ഇവിടെ സൈൻ അപ്പ് ചെയ്യുക
+                {language === 'en' ? 'Sign up here' : 'ഇവിടെ സൈൻ അപ്പ് ചെയ്യുക'}
               </Link>
             </p>
           </div>
@@ -155,7 +156,7 @@ export default function Chat() {
         <div className="p-4 border-b border-border">
           <Button onClick={handleNewChat} className="w-full rounded-xl" size="sm">
             <Plus className="h-4 w-4 mr-2" />
-            New Chat / പുതിയ ചാറ്റ്
+            {language === 'en' ? 'New Chat' : 'പുതിയ ചാറ്റ്'}
           </Button>
         </div>
         <div className="p-4">
@@ -202,8 +203,7 @@ export default function Chat() {
             {sessions.length === 0 && !chatLoading && (
               <div className="text-center text-muted-foreground py-8">
                 <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No chats yet</p>
-                <p className="text-xs malayalam">ഇതുവരെ ചാറ്റുകളില്ല</p>
+                <p className="text-sm">{language === 'en' ? 'No chats yet' : 'ഇതുവരെ ചാറ്റുകളില്ല'}</p>
               </div>
             )}
           </div>
@@ -221,13 +221,19 @@ export default function Chat() {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <div>
-            <h1 className="text-xl font-semibold">
-              {currentSession?.title || 'AI Chat Assistant'}
-            </h1>
-            <p className="text-sm text-muted-foreground malayalam">
-              AI ചാറ്റ് സഹായി - കൃഷിയെക്കുറിച്ച് ചോദിക്കുക
-            </p>
+          <div className="flex items-center gap-3">
+            <div>
+              <h1 className="text-xl font-semibold">
+                {currentSession?.title || (language === 'en' ? 'AI Chat Assistant' : 'AI ചാറ്റ് സഹായി')}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {language === 'en' ? 'Ask about farming' : 'കൃഷിയെക്കുറിച്ച് ചോദിക്കുക'}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={toggleLanguage} className="rounded-full">
+              <Languages className="h-4 w-4 mr-2" />
+              {language === 'en' ? 'English' : 'മലയാളം'}
+            </Button>
           </div>
         </div>
 
@@ -236,12 +242,13 @@ export default function Chat() {
             {messages.length === 0 && !chatLoading && (
               <div className="text-center py-12">
                 <Bot className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">Welcome to Krishi Mitra</h3>
-                <p className="text-muted-foreground mb-1">
-                  Ask me anything about farming, crops, weather, or agricultural practices.
-                </p>
-                <p className="text-sm text-muted-foreground malayalam">
-                  കൃഷി, വിളകൾ, കാലാവസ്ഥ, അല്ലെങ്കിൽ കാർഷിക രീതികളെക്കുറിച്ച് എന്തും ചോദിക്കുക.
+                <h3 className="text-lg font-medium mb-2">
+                  {language === 'en' ? 'Welcome to Krishi Mitra' : 'കൃഷി മിത്രത്തിലേക്ക് സ്വാഗതം'}
+                </h3>
+                <p className="text-muted-foreground">
+                  {language === 'en'
+                    ? 'Ask me anything about farming, crops, weather, or agricultural practices.'
+                    : 'കൃഷി, വിളകൾ, കാലാവസ്ഥ, അല്ലെങ്കിൽ കാർഷിക രീതികളെക്കുറിച്ച് എന്തും ചോദിക്കുക.'}
                 </p>
               </div>
             )}
@@ -280,7 +287,7 @@ export default function Chat() {
                 <div className="flex-1">
                   <div className="font-medium text-sm mb-1">Krishi Mitra</div>
                   <div className="text-sm text-muted-foreground">
-                    Thinking... / ചിന്തിക്കുന്നു...
+                    {language === 'en' ? 'Thinking...' : 'ചിന്തിക്കുന്നു...'}
                   </div>
                 </div>
               </div>
@@ -295,7 +302,7 @@ export default function Chat() {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message... / നിങ്ങളുടെ സന്ദേശം ടൈപ്പ് ചെയ്യുക..."
+                placeholder={language === 'en' ? 'Type your message...' : 'നിങ്ങളുടെ സന്ദേശം ടൈപ്പ് ചെയ്യുക...'}
                 disabled={isProcessing}
                 className="pr-12 rounded-xl"
               />

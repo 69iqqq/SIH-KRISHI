@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Users
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const contactInfo = [
   {
@@ -65,6 +66,7 @@ const faqItems = [
 ];
 
 export default function Contact() {
+  const { language } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -90,16 +92,10 @@ export default function Contact() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Contact Us
+            {language === 'en' ? 'Contact Us' : 'ഞങ്ങളെ ബന്ധപ്പെടുക'}
           </h1>
-          <p className="text-xl text-muted-foreground malayalam mb-4">
-            ഞങ്ങളെ ബന്ധപ്പെടുക
-          </p>
           <p className="text-lg text-muted-foreground">
-            We're here to help! Reach out with your questions, feedback, or support needs.
-          </p>
-          <p className="text-muted-foreground malayalam">
-            ഞങ്ങൾ സഹായിക്കാൻ ഇവിടെയുണ്ട്! നിങ്ങളുടെ ചോദ്യങ്ങൾ, ഫീഡ്ബാക്ക് അല്ലെങ്കിൽ പിന്തുണ ആവശ്യങ്ങൾക്കായി ബന്ധപ്പെടുക.
+            {language === 'en' ? "We're here to help! Reach out with your questions, feedback, or support needs." : 'ഞങ്ങൾ സഹായിക്കാൻ ഇവിടെയുണ്ട്! നിങ്ങളുടെ ചോദ്യങ്ങൾ, ഫീഡ്ബാക്ക് അല്ലെങ്കിൽ പിന്തുണ ആവശ്യങ്ങൾക്കായി ബന്ധപ്പെടുക.'}
           </p>
         </div>
 
@@ -109,33 +105,26 @@ export default function Contact() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Send className="h-5 w-5 text-primary" />
-                Send us a Message
-                <span className="text-sm font-normal text-muted-foreground malayalam">
-                  / ഞങ്ങൾക്ക് ഒരു സന്ദേശം അയയ്ക്കുക
-                </span>
+                {language === 'en' ? 'Send us a Message' : 'ഞങ്ങൾക്ക് ഒരു സന്ദേശം അയയ്ക്കുക'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">
-                      Name / പേര്
-                    </Label>
+                    <Label htmlFor="name">{language === 'en' ? 'Name' : 'പേര്'}</Label>
                     <Input
                       id="name"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="Your name / നിങ്ങളുടെ പേര്"
+                      placeholder={language === 'en' ? 'Your name' : 'നിങ്ങളുടെ പേര്'}
                       required
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="email">
-                      Email / ഇമെയിൽ
-                    </Label>
+                    <Label htmlFor="email">{language === 'en' ? 'Email' : 'ഇമെയിൽ'}</Label>
                     <Input
                       id="email"
                       name="email"
@@ -149,29 +138,25 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <Label htmlFor="subject">
-                    Subject / വിഷയം
-                  </Label>
+                  <Label htmlFor="subject">{language === 'en' ? 'Subject' : 'വിഷയം'}</Label>
                   <Input
                     id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    placeholder="What's this about? / ഇത് എന്തിനെക്കുറിച്ചാണ്?"
+                    placeholder={language === 'en' ? "What's this about?" : 'ഇത് എന്തിനെക്കുറിച്ചാണ്?'}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="message">
-                    Message / സന്ദേശം
-                  </Label>
+                  <Label htmlFor="message">{language === 'en' ? 'Message' : 'സന്ദേശം'}</Label>
                   <Textarea
                     id="message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Tell us how we can help... / എങ്ങനെ സഹായിക്കാനാകുമെന്ന് പറയുക..."
+                    placeholder={language === 'en' ? 'Tell us how we can help...' : 'എങ്ങനെ സഹായിക്കാനാകുമെന്ന് പറയുക...'}
                     rows={5}
                     required
                   />
@@ -179,7 +164,7 @@ export default function Contact() {
 
                 <Button type="submit" className="w-full" size="lg">
                   <Send className="mr-2 h-4 w-4" />
-                  Send Message / സന്ദേശം അയയ്ക്കുക
+                  {language === 'en' ? 'Send Message' : 'സന്ദേശം അയയ്ക്കുക'}
                 </Button>
               </form>
             </CardContent>
@@ -192,10 +177,7 @@ export default function Contact() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Phone className="h-5 w-5 text-primary" />
-                  Get in Touch
-                  <span className="text-sm font-normal text-muted-foreground malayalam">
-                    / ബന്ധപ്പെടുക
-                  </span>
+                  {language === 'en' ? 'Get in Touch' : 'ബന്ധപ്പെടുക'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -207,8 +189,7 @@ export default function Contact() {
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <div className="font-medium text-foreground">{info.title}</div>
-                        <div className="text-sm text-muted-foreground malayalam">{info.titleML}</div>
+                        <div className="font-medium text-foreground">{language === 'en' ? info.title : info.titleML}</div>
                         <div className="text-primary font-medium mt-1">{info.value}</div>
                         <div className="text-sm text-muted-foreground">{info.description}</div>
                       </div>
@@ -223,20 +204,14 @@ export default function Contact() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <HelpCircle className="h-5 w-5 text-accent" />
-                  Frequently Asked Questions
-                  <span className="text-sm font-normal text-muted-foreground malayalam">
-                    / പതിവുള്ള ചോദ്യങ്ങൾ
-                  </span>
+                  {language === 'en' ? 'Frequently Asked Questions' : 'പതിവുള്ള ചോദ്യങ്ങൾ'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {faqItems.map((item, index) => (
                   <div key={index} className="p-4 bg-muted/30 rounded-lg">
                     <div className="font-medium text-foreground mb-1">
-                      {item.question}
-                    </div>
-                    <div className="text-sm text-muted-foreground malayalam mb-2">
-                      {item.questionML}
+                      {language === 'en' ? item.question : item.questionML}
                     </div>
                     <div className="text-muted-foreground">
                       {item.answer}
@@ -253,13 +228,12 @@ export default function Contact() {
           <Card className="text-center p-6">
             <CardContent className="pt-6">
               <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold text-foreground mb-2">AI Chat Support</h3>
-              <p className="text-sm text-muted-foreground malayalam mb-3">AI ചാറ്റ് സപ്പോർട്ട്</p>
+              <h3 className="font-semibold text-foreground mb-2">{language === 'en' ? 'AI Chat Support' : 'AI ചാറ്റ് സപ്പോർട്ട്'}</h3>
               <p className="text-muted-foreground text-sm mb-4">
-                Get instant help from our AI assistant for farming questions.
+                {language === 'en' ? 'Get instant help from our AI assistant for farming questions.' : 'കൃഷി ചോദ്യങ്ങൾക്ക് ഞങ്ങളുടെ AI സഹായിയിൽ നിന്ന് ഉടൻ സഹായം നേടുക.'}
               </p>
               <Button variant="outline" size="sm" className="w-full">
-                Start Chat / ചാറ്റ് ആരംഭിക്കുക
+                {language === 'en' ? 'Start Chat' : 'ചാറ്റ് ആരംഭിക്കുക'}
               </Button>
             </CardContent>
           </Card>
@@ -267,13 +241,12 @@ export default function Contact() {
           <Card className="text-center p-6">
             <CardContent className="pt-6">
               <Users className="h-12 w-12 text-crop mx-auto mb-4" />
-              <h3 className="font-semibold text-foreground mb-2">Community Forum</h3>
-              <p className="text-sm text-muted-foreground malayalam mb-3">കമ്മ്യൂണിറ്റി ഫോറം</p>
+              <h3 className="font-semibold text-foreground mb-2">{language === 'en' ? 'Community Forum' : 'കമ്മ്യൂണിറ്റി ഫോറം'}</h3>
               <p className="text-muted-foreground text-sm mb-4">
-                Connect with other farmers and share knowledge.
+                {language === 'en' ? 'Connect with other farmers and share knowledge.' : 'മറ്റ് കർഷകരുമായി ബന്ധപ്പെടുകയും അറിവ് പങ്കിടുകയും ചെയ്യുക.'}
               </p>
               <Button variant="outline" size="sm" className="w-full">
-                Join Community / കമ്മ്യൂണിറ്റിയിൽ ചേരുക
+                {language === 'en' ? 'Join Community' : 'കമ്മ്യൂണിറ്റിയിൽ ചേരുക'}
               </Button>
             </CardContent>
           </Card>
@@ -281,13 +254,12 @@ export default function Contact() {
           <Card className="text-center p-6">
             <CardContent className="pt-6">
               <HelpCircle className="h-12 w-12 text-accent mx-auto mb-4" />
-              <h3 className="font-semibold text-foreground mb-2">Help Center</h3>
-              <p className="text-sm text-muted-foreground malayalam mb-3">സഹായ കേന്ദ്രം</p>
+              <h3 className="font-semibold text-foreground mb-2">{language === 'en' ? 'Help Center' : 'സഹായ കേന്ദ്രം'}</h3>
               <p className="text-muted-foreground text-sm mb-4">
-                Browse our comprehensive help documentation.
+                {language === 'en' ? 'Browse our comprehensive help documentation.' : 'ഞങ്ങളുടെ സമഗ്രമായ സഹായ ഡോക്യുമെന്റേഷൻ ബ്രൗസ് ചെയ്യുക.'}
               </p>
               <Button variant="outline" size="sm" className="w-full">
-                Browse Help / സഹായം ബ്രൗസ് ചെയ്യുക
+                {language === 'en' ? 'Browse Help' : 'സഹായം ബ്രൗസ് ചെയ്യുക'}
               </Button>
             </CardContent>
           </Card>

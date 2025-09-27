@@ -18,6 +18,8 @@ import {
   LogOut,
   User
 } from 'lucide-react';
+import { useLanguage } from "@/hooks/useLanguage";
+import { Languages } from "lucide-react";
 
 const navigation = [
   { name: 'Home', nameML: 'ഹോം', href: '/', icon: Home, public: true },
@@ -38,6 +40,7 @@ export function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated, signOut, loading } = useAuth();
+  const { language, toggleLanguage } = useLanguage();
 
   const handleSignOut = async () => {
     try {
@@ -66,14 +69,15 @@ export function Layout({ children }: LayoutProps) {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg gradient-hero">
                 <span className="text-lg font-bold text-primary-foreground">कृ</span>
               </div>
-              <div className="flex flex-col">
+              {language === 'en' ? (
                 <span className="text-lg font-bold text-foreground">Krishi Mitra</span>
-                <span className="text-xs text-muted-foreground malayalam">കൃഷി മിത്രം</span>
-              </div>
+              ) : (
+                <span className="text-lg font-bold text-foreground malayalam">കൃഷി മിത്രം</span>
+              )}
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center space-x-1 overflow-x-auto">
               {filteredNavigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = isActivePath(item.href);
@@ -83,15 +87,21 @@ export function Layout({ children }: LayoutProps) {
                     key={item.name}
                     to={item.href}
                     className={cn(
-                      "flex flex-col items-center px-3 py-2 rounded-lg text-sm font-medium transition-smooth hover:bg-muted",
+                      "flex flex-col items-center px-3 py-2 rounded-lg text-sm font-medium transition-smooth hover:bg-muted min-w-12",
                       isActive 
                         ? "bg-primary text-primary-foreground" 
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <Icon className="h-5 w-5 mb-1" />
-                    <span className="hidden xl:block">{item.name}</span>
-                    <span className="xl:hidden malayalam text-xs">{item.nameML}</span>
+                    {/* Show labels only on xl and above to avoid stretching */}
+                    {language === 'en' ? (
+                      <span className="hidden xl:block text-sm max-w-[120px] truncate" title={item.name}>{item.name}</span>
+                    ) : (
+                      <span className="hidden xl:block malayalam text-sm max-w-[140px] truncate" title={item.nameML}>{item.nameML}</span>
+                    )}
+                    {/* Accessible label for lg screens */}
+                    <span className="sr-only">{language === 'en' ? item.name : item.nameML}</span>
                   </Link>
                 );
               })}
@@ -100,6 +110,9 @@ export function Layout({ children }: LayoutProps) {
             {/* Right side actions */}
             <div className="flex items-center space-x-4">
               <ThemeToggle />
+              <Button variant="ghost" size="icon" onClick={toggleLanguage} className="rounded-full">
+                <Languages className="h-5 w-5" />
+              </Button>
               
               {/* Authentication Button */}
               {loading ? (
@@ -108,13 +121,13 @@ export function Layout({ children }: LayoutProps) {
                 </Button>
               ) : !isAuthenticated ? (
                 <Button size="sm" className="hidden sm:flex" asChild>
-                  <Link to="/auth">Login / സൈൻ ഇൻ</Link>
+                  <Link to="/auth">{language === 'en' ? 'Login' : 'സൈൻ ഇൻ'}</Link>
                 </Button>
               ) : (
                 <div className="hidden sm:flex items-center space-x-2">
                   <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-muted">
                     <User className="h-4 w-4" />
-                    <span className="text-sm text-muted-foreground">Welcome</span>
+                    <span className="text-sm text-muted-foreground">{language === 'en' ? 'Welcome' : 'സ്വാഗതം'}</span>
                   </div>
                   <Button 
                     variant="outline" 
@@ -122,7 +135,7 @@ export function Layout({ children }: LayoutProps) {
                     onClick={handleSignOut}
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    {language === 'en' ? 'Sign Out' : 'സൈൻ ഔട്ട്'}
                   </Button>
                 </div>
               )}
@@ -160,10 +173,11 @@ export function Layout({ children }: LayoutProps) {
                       )}
                     >
                       <Icon className="h-5 w-5" />
-                      <div className="flex flex-col">
+                      {language === 'en' ? (
                         <span>{item.name}</span>
-                        <span className="malayalam text-xs opacity-75">{item.nameML}</span>
-                      </div>
+                      ) : (
+                        <span className="malayalam">{item.nameML}</span>
+                      )}
                     </Link>
                   );
                 })}
@@ -177,13 +191,13 @@ export function Layout({ children }: LayoutProps) {
                   </Button>
                 ) : !isAuthenticated ? (
                   <Button className="w-full" asChild>
-                    <Link to="/auth">Login / സൈൻ ഇൻ</Link>
+                    <Link to="/auth">{language === 'en' ? 'Login' : 'സൈൻ ഇൻ'}</Link>
                   </Button>
                 ) : (
                   <div className="space-y-2">
                     <div className="flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-muted">
                       <User className="h-4 w-4" />
-                      <span className="text-sm text-muted-foreground">Welcome / സ്വാഗതം</span>
+                      <span className="text-sm text-muted-foreground">{language === 'en' ? 'Welcome' : 'സ്വാഗതം'}</span>
                     </div>
                     <Button 
                       variant="outline" 
@@ -191,7 +205,7 @@ export function Layout({ children }: LayoutProps) {
                       onClick={handleSignOut}
                     >
                       <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out / സൈൻ ഔട്ട്
+                      {language === 'en' ? 'Sign Out' : 'സൈൻ ഔട്ട്'}
                     </Button>
                   </div>
                 )}
@@ -214,16 +228,18 @@ export function Layout({ children }: LayoutProps) {
               <p className="text-sm text-muted-foreground">
                 © 2024 Krishi Mitra. Empowering farmers with AI.
               </p>
-              <p className="text-xs text-muted-foreground malayalam mt-1">
-                കൃഷി മിത്രം - കൃഷിക്കാരുടെ AI സഹായി
-              </p>
+              {language === 'ml' && (
+                <p className="text-xs text-muted-foreground malayalam mt-1">
+                  കൃഷി മിത്രം - കൃഷിക്കാരുടെ AI സഹായി
+                </p>
+              )}
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
-                About / കുറിച്ച്
+                {language === 'en' ? 'About' : 'കുറിച്ച്'}
               </Link>
               <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
-                Contact / ബന്ധപ്പെടുക
+                {language === 'en' ? 'Contact' : 'ബന്ധപ്പെടുക'}
               </Link>
             </div>
           </div>

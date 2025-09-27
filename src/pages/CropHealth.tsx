@@ -7,13 +7,14 @@ import { Camera, Upload, Image as ImageIcon, AlertCircle, CheckCircle, Languages
 import { analyzeCropPhoto } from "@/lib/gemiphoto";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function CropHealth() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [language, setLanguage] = useState<"en" | "ml">("en");
+  const { language, toggleLanguage } = useLanguage();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,7 +74,7 @@ export default function CropHealth() {
     if (selectedImage) analyzeImage();
   }, [selectedImage, analyzeImage]);
 
-  const toggleLanguage = () => setLanguage(prev => (prev === "en" ? "ml" : "en"));
+  // using global toggle from context
 
   return (
     <div className="container mx-auto px-4 py-8">

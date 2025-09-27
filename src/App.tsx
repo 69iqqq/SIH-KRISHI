@@ -14,6 +14,7 @@ import Schemes from "./pages/Schemes";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import { LanguageProvider } from "@/hooks/useLanguage";
 
 const queryClient = new QueryClient();
 
@@ -22,23 +23,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/crop-health" element={<CropHealth />} />
-            <Route path="/weather-market" element={<WeatherMarket />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/schemes" element={<Schemes />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
+      <LanguageProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/crop-health" element={<CropHealth />} />
+              <Route path="/weather-market" element={<WeatherMarket />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/schemes" element={<Schemes />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

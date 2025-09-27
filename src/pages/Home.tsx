@@ -14,6 +14,7 @@ import {
   User
 } from 'lucide-react';
 import heroImage from '@/assets/hero-farming.jpg';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const features = [
   {
@@ -70,6 +71,7 @@ const stats = [
 ];
 
 export default function Home() {
+  const { language } = useLanguage();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -84,31 +86,25 @@ export default function Home() {
         <div className="relative container mx-auto px-4 py-24 sm:py-32">
           <div className="max-w-4xl mx-auto text-center text-white">
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-6">
-              Krishi Mitra
-              <span className="block text-2xl sm:text-4xl text-accent font-medium malayalam mt-2">
-                കൃഷി മിത്രം
-              </span>
+              {language === 'en' ? 'Krishi Mitra' : 'കൃഷി മിത്രം'}
             </h1>
             
-            <p className="text-xl sm:text-2xl text-white/90 mb-4">
-              AI-powered farming assistant for Malayalam farmers
-            </p>
-            <p className="text-lg text-white/80 malayalam mb-8">
-              മലയാളി കർഷകർക്കായി AI ശക്തിയുള്ള കൃഷി സഹായി
+            <p className="text-xl sm:text-2xl text-white/90 mb-8">
+              {language === 'en' ? 'AI-powered farming assistant for Malayalam farmers' : 'മലയാളി കർഷകർക്കായി AI ശക്തിയുള്ള കൃഷി സഹായി'}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-lg px-8 py-6" asChild>
                 <Link to="/chat">
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Start AI Chat / AI ചാറ്റ് ആരംഭിക്കുക
+                  {language === 'en' ? 'Start AI Chat' : 'AI ചാറ്റ് ആരംഭിക്കുക'}
                 </Link>
               </Button>
               
               <Button size="lg" variant="outline" className="text-lg px-8 py-6 bg-white/10 border-white/20 text-white hover:bg-white/20" asChild>
                 <Link to="/auth">
                   <User className="mr-2 h-5 w-5" />
-                  Sign In / സൈൻ ഇൻ
+                  {language === 'en' ? 'Sign In' : 'സൈൻ ഇൻ'}
                 </Link>
               </Button>
             </div>
@@ -121,11 +117,8 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Our Features
+              {language === 'en' ? 'Our Features' : 'ഞങ്ങളുടെ സവിശേഷതകൾ'}
             </h2>
-            <p className="text-xl text-muted-foreground malayalam">
-              ഞങ്ങളുടെ സവിശേഷതകൾ
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -140,21 +133,15 @@ export default function Home() {
                       </div>
                       
                       <h3 className="text-xl font-semibold text-foreground mb-2">
-                        {feature.name}
+                        {language === 'en' ? feature.name : feature.nameML}
                       </h3>
-                      <p className="text-sm text-muted-foreground malayalam mb-3">
-                        {feature.nameML}
-                      </p>
                       
                       <p className="text-muted-foreground mb-2">
-                        {feature.description}
-                      </p>
-                      <p className="text-sm text-muted-foreground malayalam">
-                        {feature.descriptionML}
+                        {language === 'en' ? feature.description : feature.descriptionML}
                       </p>
                       
                       <div className="flex items-center mt-4 text-primary group-hover:translate-x-2 transition-smooth">
-                        <span className="text-sm font-medium">Learn more</span>
+                        <span className="text-sm font-medium">{language === 'en' ? 'Learn more' : 'കൂടുതൽ അറിയുക'}</span>
                         <ArrowRight className="ml-1 h-4 w-4" />
                       </div>
                     </Link>
@@ -181,10 +168,7 @@ export default function Home() {
                     {stat.value}
                   </div>
                   <div className="text-muted-foreground">
-                    {stat.name}
-                  </div>
-                  <div className="text-sm text-muted-foreground malayalam">
-                    {stat.nameML}
+                    {language === 'en' ? stat.name : stat.nameML}
                   </div>
                 </div>
               );
@@ -196,17 +180,14 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-16 sm:py-24 gradient-hero">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">
-            Ready to transform your farming?
+          <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-8">
+            {language === 'en' ? 'Ready to transform your farming?' : 'നിങ്ങളുടെ കൃഷി മാറ്റാൻ തയ്യാറാണോ?'}
           </h2>
-          <p className="text-xl text-primary-foreground/90 malayalam mb-8">
-            നിങ്ങളുടെ കൃഷി മാറ്റാൻ തയ്യാറാണോ?
-          </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
               <Link to="/chat">
-                Get Started / ആരംഭിക്കുക
+                {language === 'en' ? 'Get Started' : 'ആരംഭിക്കുക'}
               </Link>
             </Button>
           </div>
