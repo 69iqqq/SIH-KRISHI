@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      marketplace_listings: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          description: string | null
+          category: 'Crops' | 'Plants' | 'Foods'
+          expiry_date: string | null
+          freshness: string | null
+          image_url: string | null
+          price: number
+          unit: string | null
+          quantity: number | null
+          sold_quantity: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description?: string | null
+          category: 'Crops' | 'Plants' | 'Foods'
+          expiry_date?: string | null
+          freshness?: string | null
+          image_url?: string | null
+          price: number
+          unit?: string | null
+          quantity?: number | null
+          sold_quantity?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          category?: 'Crops' | 'Plants' | 'Foods'
+          expiry_date?: string | null
+          freshness?: string | null
+          image_url?: string | null
+          price?: number
+          unit?: string | null
+          quantity?: number | null
+          sold_quantity?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ,
+      marketplace_listing_costs: {
+        Row: {
+          listing_id: string
+          user_id: string
+          cost_price: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          listing_id: string
+          user_id: string
+          cost_price: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          listing_id?: string
+          user_id?: string
+          cost_price?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ,
+      marketplace_reviews: {
+        Row: {
+          id: string
+          listing_id: string
+          reviewer_user_id: string
+          rating: number
+          comment: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          listing_id: string
+          reviewer_user_id: string
+          rating: number
+          comment?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          listing_id?: string
+          reviewer_user_id?: string
+          rating?: number
+          comment?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -103,12 +207,149 @@ export type Database = {
         }
         Relationships: []
       }
+      ,
+      marketplace_orders: {
+        Row: {
+          id: string
+          user_id: string
+          total_amount: number
+          currency: string
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          total_amount?: number
+          currency?: string
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          total_amount?: number
+          currency?: string
+          status?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      ,
+      marketplace_order_items: {
+        Row: {
+          id: string
+          order_id: string
+          listing_id: string | null
+          title: string
+          unit_price: number
+          quantity: number
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          listing_id?: string | null
+          title: string
+          unit_price: number
+          quantity: number
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          listing_id?: string | null
+          title?: string
+          unit_price?: number
+          quantity?: number
+        }
+        Relationships: []
+      }
+      ,
+      marketplace_comments: {
+        Row: {
+          id: string
+          listing_id: string
+          commenter_user_id: string
+          comment: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          listing_id: string
+          commenter_user_id: string
+          comment: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          listing_id?: string
+          commenter_user_id?: string
+          comment?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      ,
+      product_reviews: {
+        Row: {
+          id: string
+          product_id: number
+          reviewer_user_id: string
+          rating: number
+          comment: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: number
+          reviewer_user_id: string
+          rating: number
+          comment?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: number
+          reviewer_user_id?: string
+          rating?: number
+          comment?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      ,
+      product_comments: {
+        Row: {
+          id: string
+          product_id: number
+          commenter_user_id: string
+          comment: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: number
+          commenter_user_id: string
+          comment: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: number
+          commenter_user_id?: string
+          comment?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      purchase_listings: {
+        Args: { p_items: Json; p_currency?: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

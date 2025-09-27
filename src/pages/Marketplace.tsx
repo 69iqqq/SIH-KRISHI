@@ -2,85 +2,17 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Plus, Search, Filter, Star, MapPin, Phone } from 'lucide-react';
+import { ShoppingBag, Plus, Search, Filter, Star, MapPin, Phone, ShoppingCart, CreditCard } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Button as UIButton } from '@/components/ui/button';
+import { useCart } from '@/hooks/useCart';
+import { Link } from 'react-router-dom';
+import { products } from '@/lib/products';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useListings } from '@/hooks/useListings';
+import { useProductRatings, useListingRatings } from '@/hooks/useRatings';
 
-const mockProducts = [
-  {
-    id: 1,
-    name: 'Organic Basmati Rice',
-    nameML: 'ഓർഗാനിക് ബാസ്മതി അരി',
-    seller: 'Raj Kumar',
-    sellerML: 'രാജ് കുമാർ',
-    location: 'Palakkad',
-    locationML: 'പാലക്കാട്',
-    price: 2800,
-    unit: 'quintal',
-    unitML: 'ക്വിന്റൽ',
-    rating: 4.8,
-    image: '/api/placeholder/300/200',
-    category: 'Grains',
-    categoryML: 'ധാന്യങ്ങൾ',
-    inStock: true,
-    quantity: 50
-  },
-  {
-    id: 2,
-    name: 'Fresh Coconuts',
-    nameML: 'പുതിയ തെങ്ങ്',
-    seller: 'Priya Nair',
-    sellerML: 'പ്രിയ നായർ',
-    location: 'Kochi',
-    locationML: 'കൊച്ചി',
-    price: 18,
-    unit: 'piece',
-    unitML: 'എണ്ണം',
-    rating: 4.9,
-    image: '/api/placeholder/300/200',
-    category: 'Fruits',
-    categoryML: 'പഴങ്ങൾ',
-    inStock: true,
-    quantity: 200
-  },
-  {
-    id: 3,
-    name: 'Premium Black Pepper',
-    nameML: 'പ്രീമിയം കുരുമുളക്',
-    seller: 'Thomas Joseph',
-    sellerML: 'തോമസ് ജോസഫ്',
-    location: 'Wayanad',
-    locationML: 'വയനാട്',
-    price: 48000,
-    unit: 'quintal',
-    unitML: 'ക്വിന്റൽ',
-    rating: 4.7,
-    image: '/api/placeholder/300/200',
-    category: 'Spices',
-    categoryML: 'സുഗന്ധവ്യഞ്ജനങ്ങൾ',
-    inStock: false,
-    quantity: 0
-  },
-  {
-    id: 4,
-    name: 'Green Cardamom',
-    nameML: 'പച്ച ഏലം',
-    seller: 'Mini Sebastian',
-    sellerML: 'മിനി സെബാസ്റ്റ്യൻ',
-    location: 'Idukki',
-    locationML: 'ഇടുക്കി',
-    price: 125000,
-    unit: 'quintal',
-    unitML: 'ക്വിന്റൽ',
-    rating: 4.9,
-    image: '/api/placeholder/300/200',
-    category: 'Spices',
-    categoryML: 'സുഗന്ധവ്യഞ്ജനങ്ങൾ',
-    inStock: true,
-    quantity: 10
-  }
-];
+// products data moved to shared module
 
 const categories = [
   { name: 'All', nameML: 'എല്ലാം' },
@@ -95,13 +27,19 @@ export default function Marketplace() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
   const { language } = useLanguage();
+  const { addItem, count } = useCart();
+  const { listings } = useListings();
 
-  const filteredProducts = mockProducts.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.nameML.includes(searchTerm);
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Ratings hooks (after filteredProducts and listings are known for this render)
+  const { ratings: productRatings } = useProductRatings(filteredProducts.map((p) => p.id));
+  const { ratings: listingRatings } = useListingRatings(listings.map((l) => l.id));
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -138,10 +76,20 @@ export default function Marketplace() {
             </Button>
           </div>
           
-          <Button className="lg:w-auto">
-            <Plus className="mr-2 h-4 w-4" />
-            {language === 'en' ? 'Sell Your Crop' : 'നിങ്ങളുടെ വിള വിൽക്കുക'}
-          </Button>
+          <div className="flex gap-2">
+            <Button className="lg:w-auto" asChild>
+              <Link to="/sell">
+              <Plus className="mr-2 h-4 w-4" />
+              {language === 'en' ? 'Sell Your Crop' : 'നിങ്ങളുടെ വിള വിൽക്കുക'}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/cart">
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'Cart' : 'കാർട്ട്'} ({count})
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -171,8 +119,70 @@ export default function Marketplace() {
             </Card>
           </div>
 
-          {/* Product Grid */}
+          {/* Main content column (Community listings + Product grid) */}
           <div className="flex-1">
+            {/* Community Listings */}
+            {listings.length > 0 && (
+              <div className="mb-10">
+                <h2 className="text-xl font-semibold mb-3">{language === 'en' ? 'Community Listings' : 'കമ്മ്യൂണിറ്റി ലിസ്റ്റിംഗുകൾ'}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {listings.map((l) => (
+                    <Card key={l.id} className="group hover:shadow-soft transition-smooth overflow-hidden">
+                      <div className="relative">
+                        <div className="h-48 bg-muted flex items-center justify-center">
+                          <ShoppingBag className="h-16 w-16 text-muted-foreground" />
+                        </div>
+                        <Badge className="absolute top-2 left-2 bg-emerald-600">{l.category}</Badge>
+                      </div>
+                      <CardContent className="p-4">
+                        <div className="mb-3">
+                          <h3 className="font-semibold text-foreground mb-1">{l.title}</h3>
+                        </div>
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <div className="text-2xl font-bold text-primary">₹{Number(l.price).toLocaleString()}</div>
+                            <div className="text-sm text-muted-foreground">{language === 'en' ? `per ${l.unit || 'piece'}` : `${l.unit || 'യൂണിറ്റ്'} ന്`}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
+                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              {listingRatings[l.id]?.avg ? (
+                                <>
+                                  <span className="font-medium">{listingRatings[l.id].avg.toFixed(1)}</span>
+                                  <span className="text-xs">({listingRatings[l.id].count})</span>
+                                </>
+                              ) : (
+                                <span className="text-xs">{language === 'en' ? 'No ratings' : 'റേറ്റിംഗ് ഇല്ല'}</span>
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground">{language === 'en' ? `${l.quantity ?? 1} available` : `${l.quantity ?? 1} ലഭ്യം`}</div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button size="icon" onClick={() => addItem({ id: l.id, name: l.title, price: Number(l.price), unit: l.unit || undefined }, 1)}>
+                                <ShoppingCart className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{language === 'en' ? 'Add to Cart' : 'കാർട്ടിലേക്ക് ചേർക്കുക'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Button variant="outline" asChild>
+                            <Link to={`/listing/${l.id}`}>
+                              <CreditCard className="h-4 w-4 mr-2" />{language === 'en' ? 'Buy Now' : 'ഇപ്പോൾ വാങ്ങുക'}
+                            </Link>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Product Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredProducts.map((product) => (
                 <Card key={product.id} className="group hover:shadow-soft transition-smooth overflow-hidden">
@@ -218,7 +228,14 @@ export default function Marketplace() {
                       <div className="text-right">
                         <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          {product.rating}
+                          {productRatings[product.id]?.avg ? (
+                            <>
+                              <span className="font-medium">{productRatings[product.id].avg.toFixed(1)}</span>
+                              <span className="text-xs">({productRatings[product.id].count})</span>
+                            </>
+                          ) : (
+                            <span className="text-xs">{language === 'en' ? 'No ratings' : 'റേറ്റിംഗ് ഇല്ല'}</span>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {language === 'en' ? `${product.quantity} available` : `${product.quantity} ലഭ്യം`}
@@ -236,14 +253,38 @@ export default function Marketplace() {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button 
-                        className="flex-1" 
-                        disabled={!product.inStock}
-                      >
-                        <ShoppingBag className="mr-2 h-4 w-4" />
-                        {product.inStock ? (language === 'en' ? 'Buy Now' : 'ഇപ്പോൾ വാങ്ങുക') : (language === 'en' ? 'Out of Stock' : 'സ്റ്റോക്ക് ഇല്ല')}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            size="icon"
+                            disabled={!product.inStock}
+                            aria-label={product.inStock ? (language === 'en' ? 'Add to Cart' : 'കാർട്ടിലേക്ക് ചേർക്കുക') : (language === 'en' ? 'Out of Stock' : 'സ്റ്റോക്ക് ഇല്ല')}
+                            onClick={() => {
+                              if (!product.inStock) return;
+                              addItem({
+                                id: product.id,
+                                name: product.name,
+                                nameML: product.nameML,
+                                price: product.price,
+                                unit: product.unit,
+                                unitML: product.unitML,
+                              }, 1);
+                            }}
+                          >
+                            <ShoppingCart className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{product.inStock ? (language === 'en' ? 'Add to Cart' : 'കാർട്ടിലേക്ക് ചേർക്കുക') : (language === 'en' ? 'Out of Stock' : 'സ്റ്റോക്ക് ഇല്ല')}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      {/* Buy Now navigates to the detailed Buy page */}
+                      <Button variant="outline" asChild>
+                        <Link to={`/buy/${product.id}`}>
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          {language === 'en' ? 'Buy Now' : 'ഇപ്പോൾ വാങ്ങുക'}
+                        </Link>
                       </Button>
-                      
                       <Button variant="outline" size="icon">
                         <Phone className="h-4 w-4" />
                       </Button>

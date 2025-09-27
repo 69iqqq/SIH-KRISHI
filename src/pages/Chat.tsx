@@ -153,13 +153,39 @@ export default function Chat() {
         "w-80 border-r border-border flex-col bg-card transition-transform duration-300 ease-in-out",
         isSidebarOpen ? 'flex' : 'hidden'
       )}>
-        <div className="p-4 border-b border-border">
+        {/* Sidebar header: hide toggle + language toggle + title/subtitle */}
+        <div className="p-4 border-b border-border bg-card">
+          <div className="flex items-center justify-between mb-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarOpen(false)}
+              className="rounded-full h-9 w-9"
+              aria-label={language === 'en' ? 'Hide sidebar' : 'സൈഡ്ബാർ മറയ്ക്കുക'}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={toggleLanguage} className="rounded-full">
+              <Languages className="h-4 w-4 mr-2" />
+              {language === 'en' ? 'English' : 'മലയാളം'}
+            </Button>
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold">
+              {currentSession?.title || (language === 'en' ? 'AI Chat Assistant' : 'AI ചാറ്റ് സഹായി')}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {language === 'en' ? 'Ask about farming' : 'കൃഷിയെക്കുറിച്ച് ചോദിക്കുക'}
+            </p>
+          </div>
+        </div>
+        <div className="p-4">
           <Button onClick={handleNewChat} className="w-full rounded-xl" size="sm">
             <Plus className="h-4 w-4 mr-2" />
             {language === 'en' ? 'New Chat' : 'പുതിയ ചാറ്റ്'}
           </Button>
         </div>
-        <div className="p-4">
+        <div className="px-4 pb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -211,31 +237,21 @@ export default function Chat() {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
-        <div className="p-4 border-b border-border bg-card flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="rounded-full h-9 w-9"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-xl font-semibold">
-                {currentSession?.title || (language === 'en' ? 'AI Chat Assistant' : 'AI ചാറ്റ് സഹായി')}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {language === 'en' ? 'Ask about farming' : 'കൃഷിയെക്കുറിച്ച് ചോദിക്കുക'}
-              </p>
-            </div>
-            <Button variant="outline" size="sm" onClick={toggleLanguage} className="rounded-full">
-              <Languages className="h-4 w-4 mr-2" />
-              {language === 'en' ? 'English' : 'മലയാളം'}
+      <div className="flex-1 flex flex-col relative">
+        {/* Floating open-sidebar button when sidebar hidden */}
+        {!isSidebarOpen && (
+          <div className="absolute top-2 left-2 z-20">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarOpen(true)}
+              className="rounded-full h-9 w-9"
+              aria-label={language === 'en' ? 'Show sidebar' : 'സൈഡ്ബാർ കാണിക്കുക'}
+            >
+              <Menu className="h-5 w-5" />
             </Button>
           </div>
-        </div>
+        )}
 
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4 max-w-4xl mx-auto">

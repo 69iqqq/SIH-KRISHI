@@ -39,8 +39,10 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated, signOut, loading } = useAuth();
+  const { isAuthenticated, signOut, loading, user } = useAuth();
   const { language, toggleLanguage } = useLanguage();
+  const isCropHealthPage = location.pathname.startsWith('/crop-health');
+  const isChatPage = location.pathname.startsWith('/chat');
 
   const handleSignOut = async () => {
     try {
@@ -59,11 +61,11 @@ export function Layout({ children }: LayoutProps) {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center justify-between py-2">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg gradient-hero">
@@ -76,8 +78,8 @@ export function Layout({ children }: LayoutProps) {
               )}
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1 overflow-x-auto">
+            {/* Desktop Navigation - farmer-friendly: wraps, no scroll, small icons, underline active */}
+            <nav className="hidden lg:flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               {filteredNavigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = isActivePath(item.href);
@@ -87,21 +89,25 @@ export function Layout({ children }: LayoutProps) {
                     key={item.name}
                     to={item.href}
                     className={cn(
-                      "flex flex-col items-center px-3 py-2 rounded-lg text-sm font-medium transition-smooth hover:bg-muted min-w-12",
-                      isActive 
-                        ? "bg-primary text-primary-foreground" 
-                        : "text-muted-foreground hover:text-foreground"
+                      "group relative inline-flex flex-col items-center px-2 py-1 text-sm font-medium text-muted-foreground transition-colors",
+                      isActive ? "text-foreground" : "hover:text-foreground"
                     )}
                   >
-                    <Icon className="h-5 w-5 mb-1" />
-                    {/* Show labels only on xl and above to avoid stretching */}
-                    {language === 'en' ? (
-                      <span className="hidden xl:block text-sm max-w-[120px] truncate" title={item.name}>{item.name}</span>
-                    ) : (
-                      <span className="hidden xl:block malayalam text-sm max-w-[140px] truncate" title={item.nameML}>{item.nameML}</span>
-                    )}
-                    {/* Accessible label for lg screens */}
-                    <span className="sr-only">{language === 'en' ? item.name : item.nameML}</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Icon className="h-4 w-4 opacity-80" />
+                      {language === 'en' ? (
+                        <span className="text-sm whitespace-nowrap" title={item.name}>{item.name}</span>
+                      ) : (
+                        <span className="text-sm whitespace-nowrap malayalam" title={item.nameML}>{item.nameML}</span>
+                      )}
+                    </span>
+                    {/* Apple-like underline indicator */}
+                    <span
+                      className={cn(
+                        "mt-1 h-0.5 w-6 rounded-full bg-foreground transition-all",
+                        isActive ? "opacity-100" : "opacity-0 group-hover:opacity-80"
+                      )}
+                    />
                   </Link>
                 );
               })}
@@ -125,9 +131,13 @@ export function Layout({ children }: LayoutProps) {
                 </Button>
               ) : (
                 <div className="hidden sm:flex items-center space-x-2">
-                  <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-muted">
+                  <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-muted max-w-[200px]">
                     <User className="h-4 w-4" />
-                    <span className="text-sm text-muted-foreground">{language === 'en' ? 'Welcome' : 'സ്വാഗതം'}</span>
+                    <span className="text-sm text-muted-foreground truncate" title={
+                      (user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email) ?? undefined
+                    }>
+                      {(user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User')}
+                    </span>
                   </div>
                   <Button 
                     variant="outline" 
@@ -197,7 +207,11 @@ export function Layout({ children }: LayoutProps) {
                   <div className="space-y-2">
                     <div className="flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-muted">
                       <User className="h-4 w-4" />
-                      <span className="text-sm text-muted-foreground">{language === 'en' ? 'Welcome' : 'സ്വാഗതം'}</span>
+                      <span className="text-sm text-muted-foreground truncate max-w-[180px]" title={
+                        (user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email) ?? undefined
+                      }>
+                        {(user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User')}
+                      </span>
                     </div>
                     <Button 
                       variant="outline" 
@@ -220,31 +234,33 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t bg-muted/30">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-muted-foreground">
-                © 2024 Krishi Mitra. Empowering farmers with AI.
-              </p>
-              {language === 'ml' && (
-                <p className="text-xs text-muted-foreground malayalam mt-1">
-                  കൃഷി മിത്രം - കൃഷിക്കാരുടെ AI സഹായി
+      {/* Footer (hidden on Crop Health page) */}
+      {!isCropHealthPage && (
+        <footer className="border-t bg-muted/30">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-center sm:text-left">
+                <p className="text-sm text-muted-foreground">
+                  © 2024 Krishi Mitra. Empowering farmers with AI.
                 </p>
-              )}
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
-                {language === 'en' ? 'About' : 'കുറിച്ച്'}
-              </Link>
-              <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
-                {language === 'en' ? 'Contact' : 'ബന്ധപ്പെടുക'}
-              </Link>
+                {language === 'ml' && (
+                  <p className="text-xs text-muted-foreground malayalam mt-1">
+                    കൃഷി മിത്രം - കൃഷിക്കാരുടെ AI സഹായി
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center space-x-4">
+                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
+                  {language === 'en' ? 'About' : 'കുറിച്ച്'}
+                </Link>
+                <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
+                  {language === 'en' ? 'Contact' : 'ബന്ധപ്പെടുക'}
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }
